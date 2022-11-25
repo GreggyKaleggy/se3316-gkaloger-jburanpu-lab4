@@ -9,8 +9,8 @@ const db = mongoose.connection;
 // Get all artists
 router.get('/', async (req, res) => {
     try {
-        const result = await db.collection('artists').find({}, 'artist_id artist_name artist_handle artist_members artist_favorites tags artist_location -_id', function (err, docs) {
-            result = docs.toArray();
+        const result = await db.collection('artists').find({}, {_id:0, artist_id:1, artist_favorites:1, artist_handle:1, artist_location:1, artist_members:1, artist_name:1, tags:1, }, function (err, artists) {
+           console.log(artists);
         });
         res.json(result)
     }
