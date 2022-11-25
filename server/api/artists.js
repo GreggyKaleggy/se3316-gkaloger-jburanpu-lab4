@@ -9,21 +9,8 @@ const db = mongoose.connection;
 // Get all artists
 router.get('/', async (req, res) => {
     try {
-        const artists = await getArtists()
-
-        //only show 6 keys for each artist
-        const artistsKeys = Object.keys(artists[0])
-        const artistsKeysToKeep = artistsKeys.slice(0, 19)
-        const artistsToReturn = artists.map(artist => {
-            const artistToReturn = {}
-            artistsKeysToKeep.forEach(key => {
-                artistToReturn[key] = artist[key]
-            })
-            return artistToReturn
-        })
-
-        //only show first 100 artists
-        res.json(artistsToReturn.slice(0, 100))
+        const result = await db.collection('artists').find().select('artist_id artist_name artist_handle artist_members artist_favorites tags artist_location').toArray();
+        res.json(result)
     }
     catch (err) {
         console.error(err.message);
