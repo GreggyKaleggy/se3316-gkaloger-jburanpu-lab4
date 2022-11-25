@@ -10,9 +10,8 @@ const db = mongoose.connection;
 //route for /api/tracks
 router.get('/', async (req, res) => {
     try {
-        console.log('working')
-        const tracks = await getTracks()
-        res.json(tracks)
+        const result = await db.collection('tracks').find().toArray();
+        res.json(result)
     }
     catch (err) {
         console.error(err.message);
@@ -21,7 +20,7 @@ router.get('/', async (req, res) => {
 });
 
 
-//Getting the details needed given the 
+//Getting the details needed given the track id
 router.get('/:id', async (req, res) => {
     try {
         if (isNaN(req.params.id)) {
@@ -31,15 +30,12 @@ router.get('/:id', async (req, res) => {
             return res.status(404).json({ errors: [{ msg: 'Enter a valid ID' }] })
         }
 
-        const tracks = await getTracks()
-        const track = tracks.find(track => track.track_id === req.params.id)
-        if (!track) {
+        const result = await db.collection('tracks').findOne({ track_id: req.params.id });
+        if (!result) {
             return res.status(404).json({ errors: [{ msg: 'Track not found' }] });
         }
-        const { album_id, album_title, artist_id, artist_name, tags, track_date_created, track_date_recorded, track_duration, track_genres, track_number, track_title } = track
+        const { album_id, album_title, artist_id, artist_name, tags, track_date_created, track_date_recorded, track_duration, track_genres, track_number, track_title } = result
         newObj = { album_id, album_title, artist_id, artist_name, tags, track_date_created, track_date_recorded, track_duration, track_genres, track_number, track_title }
-
-
         if (!newObj) {
             return res.status(404).json({ errors: [{ msg: 'No Tracks Found' }] });
         }
@@ -56,30 +52,17 @@ router.get('/:id', async (req, res) => {
 Get the first n number of matching track IDs for a given search pattern matching the track title or album. 
 If the number of matches is less than n, then return all matches. Please feel free to pick a suitable value for n.
 */
-
 router.get('/search/:title', async (req, res) => {
     try {
-        const tracks = await getTracks()
         const search = req.params.title
         const searchResults = []
+        const regex = new RegExp(search, 'i')
+        const result = await db.collection('tracks').find({ track_title: { $regex: regex } }).toArray();
+        if (!result) {
+            return res.status(404).json({ errors: [{ msg: 'No Tracks Found' }] });
+        }
 
-        //if search is too long, prompt user to enter a shorter search term
-        if (search.length > 10) {
-            return res.status(404).json({ errors: [{ msg: 'Please enter a shorter search term' }] });
-        }
-        for (let i = 0; i < tracks.length; i++) {
-            if (tracks[i].track_title.includes(search) || tracks[i].album_title.includes(search)) {
-                //push track_id and track_title and album title to searchResults
-                //only show first 20 results
-                if (searchResults.length < 20) {
-                    searchResults.push({ track_id: tracks[i].track_id, track_title: tracks[i].track_title, album_title: tracks[i].album_title })
-                }
-            }
-        }
-        if (searchResults.length === 0) {
-            return res.status(404).json({ errors: [{ msg: 'No tracks with that search' }] });
-        }
-        res.json(searchResults)
+        res.json(result)
     }
     catch (err) {
         console.error(err.message);
