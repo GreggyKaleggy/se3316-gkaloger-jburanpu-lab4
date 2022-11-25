@@ -3,18 +3,9 @@ const router = express.Router();
 const fs = require('fs')
 const csv = require("csv-parser")
 const { getTracks } = require('./tracks')
+const mongoose = require('mongoose');
+const db = mongoose.connection;
 
-const getGenres = () => {
-    const genres = []
-    return new Promise((resolve) => {
-        fs.createReadStream('data/genres.csv')
-            .pipe(csv({}))
-            .on('data', (data) => genres.push(data))
-            .on('end', () => {
-                resolve(genres)
-            });
-    })
-}
 
 //get all genres
 router.get('/', async (req, res) => {
@@ -30,4 +21,4 @@ router.get('/', async (req, res) => {
 });
 
 
-module.exports = { router, getGenres }
+module.exports = { router }

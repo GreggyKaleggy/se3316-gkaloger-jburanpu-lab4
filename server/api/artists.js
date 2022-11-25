@@ -2,19 +2,9 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs')
 const csv = require("csv-parser")
+const mongoose = require('mongoose');
+const db = mongoose.connection;
 
-const getArtists = () => {
-    const artists = []
-    return new Promise((resolve) => {
-        fs.createReadStream('data/raw_artists.csv')
-            .pipe(csv({}))
-            .on('data', (data) => artists.push(data))
-            .on('end', () => {
-                resolve(artists)
-            });
-    })
-
-}
 
 // Get all artists
 router.get('/', async (req, res) => {
@@ -93,4 +83,4 @@ router.get('/name/:name', async (req, res) => {
 });
 
 
-module.exports = { router, getArtists }
+module.exports = { router }

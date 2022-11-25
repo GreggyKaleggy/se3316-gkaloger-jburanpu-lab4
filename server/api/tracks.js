@@ -3,19 +3,9 @@ const router = express.Router();
 const fs = require('fs');
 const csv = require("csv-parser");
 const { getAlbums } = require('./albums');
+const mongoose = require('mongoose');
+const db = mongoose.connection;
 
-
-const getTracks = () => {
-    const tracks = []
-    return new Promise((resolve) => {
-        fs.createReadStream('data/raw_tracks.csv')
-            .pipe(csv({}))
-            .on('data', (data) => tracks.push(data))
-            .on('end', () => {
-                resolve(tracks)
-            });
-    })
-}
 
 //route for /api/tracks
 router.get('/', async (req, res) => {
@@ -98,4 +88,4 @@ router.get('/search/:title', async (req, res) => {
 });
 
 
-module.exports = { router, getTracks }
+module.exports = { router }
