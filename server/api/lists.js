@@ -77,12 +77,12 @@ router.put('/add', async (req, res) => {
         }
 
         const trackduration = tracks.find(c => c.track_id === req.body.trackID).track_duration;
-        if(trackduration.length < 6){
-            var durationMin = "00:"+String(trackduration)
+        if (trackduration.length < 6) {
+            var durationMin = "00:" + String(trackduration)
         }
-          durationMin = moment.duration(durationMin).asMinutes();
+        durationMin = moment.duration(durationMin).asMinutes();
 
-        list.tracklist.push({ trackID: req.body.trackID, trackduration: durationMin});
+        list.tracklist.push({ trackID: req.body.trackID, trackduration: durationMin });
 
         list.numberofTracks = list.tracklist.length;
 

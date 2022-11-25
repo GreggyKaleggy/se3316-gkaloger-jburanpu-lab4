@@ -1,9 +1,9 @@
 const express = require('express')
 const app = express();
-const connectToDatabase = require("./db");
 const cors = require('cors');
 const { response } = require('express');
 const path = require('path');
+const connectToDatabase = require('./db');
 
 connectToDatabase();
 

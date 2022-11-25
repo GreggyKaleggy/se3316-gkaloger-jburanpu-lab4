@@ -1,6 +1,7 @@
+const mongoose = require('mongoose');
 const uri = "mongodb+srv://jamjam:jamjamjam123@cluster0.z9pyd3y.mongodb.net/?retryWrites=true&w=majority"
 
-const mongoose = require('mongoose');
+
 
 const connectToDatabase = async () => {
     try {
@@ -15,5 +16,8 @@ const connectToDatabase = async () => {
         process.exit(0);
     }
 }
+
+
+
 
 module.exports = connectToDatabase;
