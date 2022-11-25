@@ -1,6 +1,7 @@
 const { application } = require('express');
 const e = require('express');
 const express = require('express');
+const moment = require('moment')
 const router = express.Router();
 router.use(express.json());
 const { getTracks } = require('./tracks')
@@ -76,8 +77,12 @@ router.put('/add', async (req, res) => {
         }
 
         const trackduration = tracks.find(c => c.track_id === req.body.trackID).track_duration;
-        const trackDurationNum = Number(trackduration.slice(0, 2)) * 60 + Number(trackduration.slice(3, 5));
-        list.tracklist.push({ trackID: req.body.trackID, trackduration: trackDurationNum });
+        if(trackduration.length < 6){
+            var durationMin = "00:"+String(trackduration)
+        }
+          durationMin = moment.duration(durationMin).asMinutes();
+
+        list.tracklist.push({ trackID: req.body.trackID, trackduration: durationMin});
 
         list.numberofTracks = list.tracklist.length;
 
