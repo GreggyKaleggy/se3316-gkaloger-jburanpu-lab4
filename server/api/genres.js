@@ -10,9 +10,8 @@ const db = mongoose.connection;
 //get all genres
 router.get('/', async (req, res) => {
     try {
-        console.log('working')
-        const genres = await getGenres()
-        res.json(genres)
+        const result = await db.collection('genres').find().toArray();
+        res.json(result)
     }
     catch (err) {
         console.error(err.message);
