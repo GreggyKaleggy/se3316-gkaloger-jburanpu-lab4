@@ -61,6 +61,9 @@ router.get('/search/:title', async (req, res) => {
         if (!result) {
             return res.status(404).json({ errors: [{ msg: 'No Tracks Found' }] });
         }
+        if (Object.keys(result).length >= 15){
+            result = result.slice(0,15);
+        }
 
         res.json(result)
     }
