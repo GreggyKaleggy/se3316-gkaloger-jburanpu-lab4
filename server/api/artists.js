@@ -9,10 +9,12 @@ const db = mongoose.connection;
 // Get all artists
 router.get('/', async (req, res) => {
     try {
-        const result = await db.collection('artists').find({}, {_id:0, artist_id:1, artist_favorites:1, artist_handle:1, artist_location:1, artist_members:1, artist_name:1, tags:1, }, function (err, artists) {
-           console.log(artists);
-        });
-        res.json(result)
+        const results = await db.collection('artists').find().toArray();
+        for (let i = 0; i < results.length; i++) {
+            const { artist_id, artist_favorites, artist_handle, artist_location, artist_members, artist_name, tags } = results[i];
+            results[i] = { artist_id, artist_favorites, artist_handle, artist_location, artist_members, artist_name, tags };
+        }
+        res.json(results);
     }
     catch (err) {
         console.error(err.message);
@@ -23,24 +25,18 @@ router.get('/', async (req, res) => {
 //get artist by id
 router.get('/:id', async (req, res) => {
     try {
-        const artists = await getArtists()
         if (isNaN(req.params.id)) {
             return res.status(404).json({ errors: [{ msg: 'Enter a number' }] });
         }
-        const artist = artists.find(artist => artist.artist_id === req.params.id)
-        if (!artist) {
+        const results = await db.collection('artists').findOne({ artist_id: req.params.id });
+
+        if (!results) {
             return res.status(404).json({ errors: [{ msg: 'Artist does not exist' }] });
         }
-        //if req.params.id is not a valid number, return error
-        //only show first 6 keys for artist
-        const artistsKeys = Object.keys(artist)
-        const artistsKeysToKeep = artistsKeys.slice(0, 19)
-        const artistToReturn = {}
-        artistsKeysToKeep.forEach(key => {
-            artistToReturn[key] = artist[key]
-        })
+        const { artist_id, artist_favorites, artist_handle, artist_location, artist_members, artist_name, tags } = results;
+        newObj = { artist_id, artist_favorites, artist_handle, artist_location, artist_members, artist_name, tags };
 
-        res.json(artistToReturn)
+        res.json(newObj)
     }
     catch (err) {
         console.error(err.message);
@@ -51,19 +47,17 @@ router.get('/:id', async (req, res) => {
 //get artist by name
 router.get('/name/:name', async (req, res) => {
     try {
-        const artists = await getArtists()
-
-        //caps dont matter
-        const results = artists.find(c => c.artist_name.toLowerCase() === req.params.name.toLowerCase())
-        if (!results) {
-            return res.status(404).json({ errors: [{ msg: 'Artist does not exist' }] });
+        const search = req.params.name;
+        const regex = new RegExp(search, 'i')
+        const result = await db.collection('artists').find({ artist_name: { $regex: regex } }).toArray();
+        if (!result) {
+            return res.status(404).json({ errors: [{ msg: 'No Tracks Found' }] });
         }
-        //only show artist_id and artist_name
-        const artistToReturn = {}
-        artistToReturn.artist_id = results.artist_id
-        artistToReturn.artist_name = results.artist_name
-        res.json(artistToReturn)
-
+        for (let i = 0; i < result.length; i++) {
+            const { artist_name, artist_id } = result[i];
+            result[i] = { artist_name, artist_id };
+        }
+        res.json(result);
     }
     catch (err) {
         console.error(err.message);
