@@ -54,18 +54,19 @@ If the number of matches is less than n, then return all matches. Please feel fr
 */
 router.get('/search/:title', async (req, res) => {
     try {
-        const search = req.params.title
-        const searchResults = []
+        const search = req.params.title;
         const regex = new RegExp(search, 'i')
         const result = await db.collection('tracks').find({ track_title: { $regex: regex } }).toArray();
         if (!result) {
             return res.status(404).json({ errors: [{ msg: 'No Tracks Found' }] });
         }
-        if (Object.keys(result).length >= 15){
-            result = result.slice(0,15);
+        if (Object.keys(result).length > 15) {
+            const results = result.slice(0, 15);
+            res.json(results);
         }
-
-        res.json(result)
+        else {
+            res.json(result);
+        }
     }
     catch (err) {
         console.error(err.message);
