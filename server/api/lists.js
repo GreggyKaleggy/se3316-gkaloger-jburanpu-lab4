@@ -58,16 +58,19 @@ router.put('/add', [
     check('name', 'List ID is required').not().isEmpty(),
     check('trackID', 'Track ID is required').not().isEmpty()
 ], async (req, res) => {
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        error = errors.array().map(error => error.msg);
+        return res.status(400).json({ error });
+    }
+
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            error = errors.array().map(error => error.msg);
-            return res.status(400).json({ error });
-        }
         const list = await List.findOne({ name: req.body.name });
         if (!list) {
             return res.status(400).json({ errors: [{ msg: "List doesn't exist" }] });
         }
+
         const trackCheck = await db.collection('tracks').findOne({ track_id: req.body.trackID });
         if (!trackCheck) {
             return res.status(400).json({ errors: [{ msg: "Track doesn't exist" }] });
@@ -78,6 +81,7 @@ router.put('/add', [
                 return res.status(400).json({ errors: [{ msg: "Track already in list" }] });
             }
         }
+
         const findTrack = await db.collection('tracks').find({ track_id: req.body.trackID }).toArray();
         const trackduration = findTrack[0].track_duration;
 
@@ -89,7 +93,6 @@ router.put('/add', [
         roundedDuration = Math.round(durationMin * 100) / 100;
 
         list.tracklist.push({ trackID: req.body.trackID, trackduration: roundedDuration });
-
         list.numberofTracks = list.tracklist.length;
 
         list.duration = 0;
@@ -129,6 +132,38 @@ router.delete('/delete/:name', async (req, res) => {
         }
         await list.remove();
         res.json({ msg: 'List deleted' });
+    }
+    catch (err) {
+        console.error(err.message);
+        res.status(500).send('Internal Server Error');
+    }
+})
+
+//Delete a track from a list
+router.delete('/delete/:name/:trackID', async (req, res) => {
+    try {
+        const list = await List.findOne({ name: req.params.name });
+        if (!list) {
+            return res.status(400).json({ errors: [{ msg: "List doesn't exist" }] });
+        }
+        oldLength = list.tracklist.length;
+        for (let i = 0; i < list.tracklist.length; i++) {
+            if (list.tracklist[i].trackID == req.params.trackID) {
+                list.tracklist.splice(i, 1);
+            }
+        }
+        if (oldLength == list.tracklist.length) {
+            return res.status(400).json({ errors: [{ msg: "Track is not in the list" }] });
+        }
+        list.numberofTracks = list.tracklist.length;
+
+        list.duration = 0;
+        for (let i = 0; i < list.tracklist.length; i++) {
+            list.duration += list.tracklist[i].trackduration;
+        }
+
+        await list.save();
+        res.json(list);
     }
     catch (err) {
         console.error(err.message);
