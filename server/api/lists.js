@@ -1,12 +1,10 @@
-const { application } = require('express');
-const e = require('express');
 const express = require('express');
 const moment = require('moment')
 const router = express.Router();
 router.use(express.json());
-const { getTracks } = require('./tracks')
 const List = require('../schema/listSchema');
 const { db } = require('../schema/listSchema');
+const { check, validationResult } = require('express-validator');
 
 
 //Get all lists
@@ -22,32 +20,23 @@ router.get('/', async (req, res) => {
 });
 
 //Make a new list with a name 
-router.post('/new', async (req, res) => {
+router.post('/new', [
+    check('name', 'List name is required and must be in between 3 and 20 characters').not().isEmpty().isLength({ min: 3, max: 20 })
+], async (req, res) => {
     try {
-        const tracks = await getTracks();
-
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            error = errors.array().map(error => error.msg);
+            return res.status(400).json({ error });
+        }
         const { name } = req.body;
-        const list = new List({
-            name: name,
+        const newList = new List({
+            name,
             duration: 0,
-            tracklist: []
         });
-        //if the list name is already in the database, return an error
-        const listExists = await List.findOne({ name: name });
-        if (listExists) {
-            return res.status(400).json({ errors: [{ msg: 'List already exists' }] });
-        }
-        if (name.length < 3) {
-            return res.status(400).json({ errors: [{ msg: 'List name must be at least 3 characters' }] });
-        }
-        if (name.length > 20) {
-            return res.status(400).json({ errors: [{ msg: 'List name must be less than 20 characters' }] });
-        }
-
-        await list.save();
+        const list = await newList.save();
         res.json(list);
     }
-    //If error, return 500
     catch (err) {
         console.error(err.message);
         res.status(500).send('Internal Server Error');
