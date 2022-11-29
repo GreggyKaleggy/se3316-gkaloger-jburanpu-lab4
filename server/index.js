@@ -16,6 +16,7 @@ app.use('/api/artists', require('./api/artists').router);
 app.use('/api/genres', require('./api/genres.js').router);
 app.use('/api/tracks', require('./api/tracks').router)
 app.use('/api/lists', require('./api/lists').router);
+app.use('/api/users', require('./api/users').router);
 
 
 
