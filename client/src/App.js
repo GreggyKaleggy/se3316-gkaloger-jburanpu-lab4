@@ -2,6 +2,7 @@ import './App.css';
 import Topnav from './topnav';
 import Home from './home/home';
 import ArtistsPage from './artists/artistsPage';
+import GenresPage from './genres/genresPage';
 
 
 function App() {
@@ -15,6 +16,9 @@ function App() {
       break
     case "/Artists":
       Component = ArtistsPage;
+      break
+    case "/Genres":
+      Component = GenresPage;
       break
   }
   return (
