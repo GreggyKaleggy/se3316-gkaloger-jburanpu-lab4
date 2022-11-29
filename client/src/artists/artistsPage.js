@@ -33,7 +33,7 @@ function ArtistsPage() {
           <form>
             <label htmlFor="name">Artists:</label>
             <br />
-            <input type="button" defaultValue="Get Artists" onclick="getArtistbyName(document.getElementById('name').value)" />
+            <input type="button" defaultValue="Get Artists" onclick="" />
           </form>
         </div>
       </div>

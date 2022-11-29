@@ -9,7 +9,7 @@ function GenresPage() {
           <form>
             <label htmlFor="name">Genres:</label>
             <br />
-            <input type="button" defaultValue="Get Genres" onclick="getArtistbyName(document.getElementById('name').value)" />
+            <input type="button" defaultValue="Get Genres" onclick="" />
           </form>
         </div>
       </div>

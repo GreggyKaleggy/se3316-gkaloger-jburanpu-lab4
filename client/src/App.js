@@ -3,6 +3,7 @@ import Topnav from './topnav';
 import Home from './home/home';
 import ArtistsPage from './artists/artistsPage';
 import GenresPage from './genres/genresPage';
+import ListsPage from './lists/listsPage';
 
 
 function App() {
@@ -19,6 +20,12 @@ function App() {
       break
     case "/Genres":
       Component = GenresPage;
+      break
+    case "/Lists":
+      Component = ListsPage;
+      break
+    default:
+      Component = Home;
       break
   }
   return (
