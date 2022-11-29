@@ -5,6 +5,7 @@ router.use(express.json());
 const List = require('../schema/listSchema');
 const { db } = require('../schema/listSchema');
 const { check, validationResult } = require('express-validator');
+const abbrev = require('abbrev');
 
 
 //Get all lists
@@ -77,21 +78,24 @@ router.put('/add', [
                 return res.status(400).json({ errors: [{ msg: "Track already in list" }] });
             }
         }
+        const findTrack = await db.collection('tracks').find({ track_id: req.body.trackID }).toArray();
+        const trackduration = findTrack[0].track_duration;
 
-        //const trackduration = tracks.find(c => c.track_id === req.body.trackID).track_duration;
-        //if (trackduration.length < 6) {
-        //var durationMin = "00:" + String(trackduration)
-        //}
-        //durationMin = moment.duration(durationMin).asMinutes();
+        if (trackduration.length < 6) {
+            var durationMin = "00:" + String(trackduration)
+        }
 
-        list.tracklist.push({ trackID: req.body.trackID });
+        durationMin = moment.duration(durationMin).asMinutes();
+        roundedDuration = Math.round(durationMin * 100) / 100;
+
+        list.tracklist.push({ trackID: req.body.trackID, trackduration: roundedDuration });
 
         list.numberofTracks = list.tracklist.length;
 
-        //list.duration = 0;
-        //for (let i = 0; i < list.tracklist.length; i++) {
-        //list.duration += list.tracklist[i].trackduration;
-        //}
+        list.duration = 0;
+        for (let i = 0; i < list.tracklist.length; i++) {
+            list.duration += list.tracklist[i].trackduration;
+        }
 
         await list.save();
         res.json(list);
@@ -124,7 +128,7 @@ router.delete('/delete/:name', async (req, res) => {
             return res.status(400).json({ errors: [{ msg: "List doesn't exist" }] });
         }
         await list.remove();
-        res.json({ msg: 'List removed' });
+        res.json({ msg: 'List deleted' });
     }
     catch (err) {
         console.error(err.message);
