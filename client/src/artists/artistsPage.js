@@ -4,18 +4,6 @@ import './artists.css';
 function ArtistsPage() {
   return (
     <div>
-        <meta charSet="UTF-8" />
-        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Artists</title>
-        <link rel="stylesheet" href="styles.css" />
-        <div className="topnav">
-          <a href="./index.html">Home</a>
-          <a href="./genres.html">Genres</a>
-          <a href="./lists.html">Lists</a>
-          <a className="active" href="./artists.html">Artists</a>
-          <a href="./tracks.html">Tracks</a>
-        </div>
         <div id="artists">
           <h2>Search artist by ID</h2>
           <form>
