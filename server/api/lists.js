@@ -53,45 +53,45 @@ router.post('/new', [
 
 
 //Add a track to a list
-router.put('/add', async (req, res) => {
+router.put('/add', [
+    check('name', 'List ID is required').not().isEmpty(),
+    check('trackID', 'Track ID is required').not().isEmpty()
+], async (req, res) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             error = errors.array().map(error => error.msg);
             return res.status(400).json({ error });
         }
-        const tracks = await db.collection('tracks').find().toArray();
         const list = await List.findOne({ name: req.body.name });
-
         if (!list) {
             return res.status(400).json({ errors: [{ msg: "List doesn't exist" }] });
         }
-
-        const track = await tracks.findOne({ track_id });
-        if (!track) {
+        const trackCheck = await db.collection('tracks').findOne({ track_id: req.body.trackID });
+        if (!trackCheck) {
             return res.status(400).json({ errors: [{ msg: "Track doesn't exist" }] });
         }
 
         for (let i = 0; i < list.tracklist.length; i++) {
-            if (parseInt(list.tracklist[i].trackID) === parseInt(req.body.trackID)) {
-                return res.status(400).json({ erros: [{ msg: "Track already exists in list" }] });
+            if (list.tracklist[i].trackID == req.body.trackID) {
+                return res.status(400).json({ errors: [{ msg: "Track already in list" }] });
             }
         }
 
-        const trackduration = tracks.find(c => c.track_id === req.body.trackID).track_duration;
-        if (trackduration.length < 6) {
-            var durationMin = "00:" + String(trackduration)
-        }
-        durationMin = moment.duration(durationMin).asMinutes();
+        //const trackduration = tracks.find(c => c.track_id === req.body.trackID).track_duration;
+        //if (trackduration.length < 6) {
+        //var durationMin = "00:" + String(trackduration)
+        //}
+        //durationMin = moment.duration(durationMin).asMinutes();
 
-        list.tracklist.push({ trackID: req.body.trackID, trackduration: durationMin });
+        list.tracklist.push({ trackID: req.body.trackID });
 
         list.numberofTracks = list.tracklist.length;
 
-        list.duration = 0;
-        for (let i = 0; i < list.tracklist.length; i++) {
-            list.duration += list.tracklist[i].trackduration;
-        }
+        //list.duration = 0;
+        //for (let i = 0; i < list.tracklist.length; i++) {
+        //list.duration += list.tracklist[i].trackduration;
+        //}
 
         await list.save();
         res.json(list);
