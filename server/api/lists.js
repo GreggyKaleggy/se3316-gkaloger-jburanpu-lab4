@@ -21,7 +21,7 @@ router.get('/', async (req, res) => {
 
 //Make a new list with a name 
 router.post('/new', [
-    check('name', 'List name is required and must be in between 3 and 20 characters').not().isEmpty().isLength({ min: 3, max: 20 })
+    check('name', 'List name between 3 and 20 characters is required').not().isEmpty().isLength({ min: 3, max: 20 })
 ], async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -29,13 +29,21 @@ router.post('/new', [
             error = errors.array().map(error => error.msg);
             return res.status(400).json({ error });
         }
+
         const { name } = req.body;
+        //if name is already taken, return error
+        const list = await List.findOne
+            ({ name: name });
+        if (list) {
+            return res.status(400).json({ error: 'List name already taken' });
+        }
+        //create new list
         const newList = new List({
-            name,
-            duration: 0,
+            name: name,
+            duration: 0
         });
-        const list = await newList.save();
-        res.json(list);
+        await newList.save();
+        res.json(newList);
     }
     catch (err) {
         console.error(err.message);
@@ -47,14 +55,19 @@ router.post('/new', [
 //Add a track to a list
 router.put('/add', async (req, res) => {
     try {
-        const tracks = await getTracks();
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            error = errors.array().map(error => error.msg);
+            return res.status(400).json({ error });
+        }
+        const tracks = await db.collection('tracks').find().toArray();
         const list = await List.findOne({ name: req.body.name });
 
         if (!list) {
             return res.status(400).json({ errors: [{ msg: "List doesn't exist" }] });
         }
 
-        const track = tracks.find(track => track.track_id === req.body.trackID);
+        const track = await tracks.findOne({ track_id });
         if (!track) {
             return res.status(400).json({ errors: [{ msg: "Track doesn't exist" }] });
         }
