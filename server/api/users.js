@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const config = require('../config');
 const userSchema = require('../schema/userSchema');
+const auth = require('../authFunction');
 
 //Get all users
 router.get('/', async (req, res) => {
@@ -68,7 +69,7 @@ router.post('/new', [
 
 router.put('/changepassword', [
     check('password', 'Please enter valid password').isLength({ min: 6, max: 30 }).trim().escape()
-], async (req, res) => {
+], auth, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         error = errors.array().map(error => error.msg);

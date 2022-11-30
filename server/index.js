@@ -17,6 +17,7 @@ app.use('/api/genres', require('./api/genres.js').router);
 app.use('/api/tracks', require('./api/tracks').router)
 app.use('/api/lists', require('./api/lists').router);
 app.use('/api/users', require('./api/users').router);
+app.use('/api/auth', require('./auth/auth').router);
 
 
 
