@@ -3,7 +3,7 @@ import './home.css';
 function Home() {
   return (
     <div>
-        <h1>3316 Lab 4</h1>
+        <h1>3316 Lab 4 - Homepage</h1>
         <h2>All navigation link information shown below</h2>
         <hr />
         <h2>Genres</h2>

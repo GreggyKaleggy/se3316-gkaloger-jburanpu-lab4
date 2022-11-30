@@ -1,5 +1,6 @@
 import './App.css';
 import Topnav from './topnav';
+import Landing from './landing/landingPage';
 import Home from './home/home';
 import ArtistsPage from './artists/artistsPage';
 import GenresPage from './genres/genresPage';
@@ -11,7 +12,7 @@ function App() {
   let Component
   switch (window.location.pathname){
     case "/":
-      Component = Home;
+      Component = Landing;
       break
     case "/Home":
       Component = Home;
@@ -29,7 +30,7 @@ function App() {
       Component= TracksPage;
       break
     default:
-      Component = Home;
+      Component = Landing;
       break
   }
   return (
