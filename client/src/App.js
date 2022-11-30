@@ -4,6 +4,7 @@ import Home from './home/home';
 import ArtistsPage from './artists/artistsPage';
 import GenresPage from './genres/genresPage';
 import ListsPage from './lists/listsPage';
+import TracksPage from './tracks/tracksPage';
 
 
 function App() {
@@ -23,6 +24,9 @@ function App() {
       break
     case "/Lists":
       Component = ListsPage;
+      break
+    case "/Tracks":
+      Component= TracksPage;
       break
     default:
       Component = Home;

@@ -10,7 +10,7 @@ export default function Topnav(){
                 <ActiveLink href="/Genres">Genres</ActiveLink>
                 <ActiveLink href="/Lists">Lists</ActiveLink>
                 <ActiveLink href="/Artists">Artists</ActiveLink>
-                <ActiveLink href="/">Tracks</ActiveLink>
+                <ActiveLink href="/Tracks">Tracks</ActiveLink>
                 </li>
             </ul>
         </nav>
