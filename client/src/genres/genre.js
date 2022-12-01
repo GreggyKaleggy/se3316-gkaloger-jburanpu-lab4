@@ -5,15 +5,15 @@ export default function Genre ({genres}){
     return(
         <div>
             <div>
-                Genre Name: {genres.name}
+                Genre Name: {genres.title}
             </div>
             <br/>
             <div>
-                Genre ID: {genres.id}
+                Tracks: {genres.parent}
             </div>
             <br/>
             <div>
-                Favourite: {genres.favourite}
+                Favourite: {genres.parent}
             </div>
             <br/>
         </div>

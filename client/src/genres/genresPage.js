@@ -5,10 +5,13 @@ import './genres.css';
 function GenresPage() {
   const [genres, setGenres] = useState([])
 
-  function getGenres(e){
-    setGenres(prevGenres => {
-      return[{id: 1, name:'Genre 1', favourite: 0},{id: 2, name:'Genre 2', favourite: 1},{id: 3, name:'Genre 3', favourite: 1},{id: 4, name:'Genre 4', favourite: 0}]
-    })
+  function GetGenres(e){
+    React.useEffect(()=>{
+      fetch('/api/genres')
+        .then(response => response.json())
+        .then(data =>
+          setGenres(data))
+      }, []) 
   }
 
 
@@ -18,7 +21,7 @@ function GenresPage() {
           <h2>All Genres</h2>
           <label htmlFor="name">Genres:</label>
           <br />
-          <button onClick={getGenres}>Get Genres</button>
+          <button onClick={GetGenres}>Get Genres</button>
           <GenresList genres = {genres}/>
         </div>
       </div>
