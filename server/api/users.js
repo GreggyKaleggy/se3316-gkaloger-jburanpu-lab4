@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const config = require('../config');
 const userSchema = require('../schema/userSchema');
-const auth = require('../authFunction');
+
 
 //Get all users
 router.get('/', async (req, res) => {
@@ -69,7 +69,7 @@ router.post('/new', [
 
 router.put('/changepassword', [
     check('password', 'Please enter valid password').isLength({ min: 6, max: 30 }).trim().escape()
-], auth, async (req, res) => {
+], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         error = errors.array().map(error => error.msg);
@@ -93,7 +93,7 @@ router.put('/changepassword', [
 });
 
 //admin ability to make others admin
-router.put('/admin/changestatus', auth, async (req, res) => {
+router.put('/admin/changestatus', async (req, res) => {
     try {
         const { email, isAdmin } = req.body;
         let emailCheck = await User.findOne({ email: email });
@@ -111,7 +111,7 @@ router.put('/admin/changestatus', auth, async (req, res) => {
 });
 
 //admin deactivating users
-router.put('/admin/deactivate', auth, async (req, res) => {
+router.put('/admin/deactivate', async (req, res) => {
     try {
         const { email, deactivated } = req.body;
         let emailCheck = await User.findOne({ email: email });

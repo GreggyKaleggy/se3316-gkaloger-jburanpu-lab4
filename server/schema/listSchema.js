@@ -11,6 +11,10 @@ const listSchema = new Schema({
         type: Number
     },
 
+    desc: {
+        type: String
+    },
+
     numberofTracks: {
         type: Number
     },
@@ -22,6 +26,14 @@ const listSchema = new Schema({
         trackduration: {
             type: Number
         }
-    }]
+    }],
+
+    reviews:
+        [{
+            hidden: { Boolean },
+            stars: { Number },
+            review: { String }
+        }]
+
 });
 module.exports = List = mongoose.model('list', listSchema);

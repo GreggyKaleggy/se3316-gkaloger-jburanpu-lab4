@@ -22,16 +22,17 @@ router.get('/', async (req, res) => {
 
 //Make a new list with a name 
 router.post('/new', [
-    check('name', 'List name between 3 and 20 characters is required').not().isEmpty().isLength({ min: 3, max: 20 })
+    check('name', 'List name between 3 and 20 characters is required').not().isEmpty().isLength({ min: 3, max: 20 }),
+    check('desc', 'Description can be a maximum 1000 characters').isLength({ min: 0, max: 1000 })
 ], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        error = errors.array().map(error => error.msg);
+        return res.status(400).json({ error });
+    }
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            error = errors.array().map(error => error.msg);
-            return res.status(400).json({ error });
-        }
 
-        const { name } = req.body;
+        const { name, desc } = req.body;
         //if name is already taken, return error
         const list = await List.findOne
             ({ name: name });
@@ -41,7 +42,8 @@ router.post('/new', [
         //create new list
         const newList = new List({
             name: name,
-            duration: 0
+            duration: 0,
+            desc: desc
         });
         await newList.save();
         res.json(newList);
@@ -171,5 +173,39 @@ router.delete('/delete/:name/:trackID', async (req, res) => {
     }
 })
 
+router.put('/editlist/:name', [
+    check('newName', 'List name between 3 and 20 characters is required').not().isEmpty().isLength({ min: 3, max: 20 }),
+    check('newDesc', 'Description can be a maximum 1000 characters').isLength({ min: 0, max: 1000 })
+], async (req, res) => {
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        error = errors.array().map(error => error.msg);
+        return res.status(400).json({ error });
+    }
+
+    try {
+        const list = await List.findOne({ name: req.params.name });
+        if (!list) {
+            return res.status(400).json({ errors: [{ msg: "List doesn't exist" }] });
+        }
+
+        const newInfo = {
+            name: req.body.newName,
+            desc: req.body.newDesc
+        }
+
+        list.name = newInfo.name;
+        list.desc = newInfo.desc;
+
+        await list.save();
+        res.json(list);
+
+    }
+    catch (err) {
+        console.error(err.message);
+        res.status(500).send('Internal Server Error');
+    }
+});
 
 module.exports = { router }
