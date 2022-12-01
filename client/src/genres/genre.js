@@ -3,7 +3,8 @@ import React from "react";
 
 export default function Genre ({genres}){
     return(
-        <div>
+        <>
+        <div className="GenreBox">
             <div>
                 Genre Name: {genres.title}
             </div>
@@ -16,7 +17,9 @@ export default function Genre ({genres}){
             <div>
                 Number of tracks in Genre: {genres["#tracks"]}
             </div>
-            <br/>
+            
         </div>
+        <br/>
+        </>
     )
 }

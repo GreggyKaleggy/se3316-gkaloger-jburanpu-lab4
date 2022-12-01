@@ -30,3 +30,10 @@
   color: rgb(255, 255, 255);
 }
 
+.GenreBox{
+  padding: 10px 10px;
+  border: 5px solid black;
+  border-radius: 15px;
+  background-color: whitesmoke;
+}
+
