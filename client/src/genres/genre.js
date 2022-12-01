@@ -7,13 +7,14 @@ export default function Genre ({genres}){
             <div>
                 Genre Name: {genres.title}
             </div>
-            <br/>
             <div>
-                Tracks: {genres.parent}
+                Genre ID: {genres.genre_id}
             </div>
-            <br/>
             <div>
-                Favourite: {genres.parent}
+                Parent Genre ID: {genres.parent}
+            </div>
+            <div>
+                Number of tracks in Genre: {genres["#tracks"]}
             </div>
             <br/>
         </div>
