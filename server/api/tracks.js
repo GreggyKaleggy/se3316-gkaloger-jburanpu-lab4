@@ -13,7 +13,6 @@ router.get('/', async (req, res) => {
     try {
         const result = await db.collection('tracks').find().toArray();
         res.json(result)
-        console.log(result)
     }
     catch (err) {
         console.error(err.message);
@@ -23,7 +22,7 @@ router.get('/', async (req, res) => {
 
 
 //Getting the details needed given the track id
-router.get('/:id', async (req, res) => {
+router.get('/trackID/:id', async (req, res) => {
     try {
         if (isNaN(req.params.id)) {
             return res.status(404).json('Track ID must be an integer');
@@ -77,23 +76,26 @@ router.get('/search/:title', async (req, res) => {
 });
 
 
-router.get('/searchTracks', async (req, res) => {
-    const searchName = req.query.name;
-    const searchArtist = req.query.artist;
-    const searchGenre = req.query.genre;
-
+router.get('/trackSearch', async (req, res) => {
+    var searchName = req.query.name;
+    var searchArtist = req.query.artist;
+    var searchGenre = req.query.genre;
     try {
-        const allTitles = await db.collection('tracks').find({}, { projection: { _id: 0, track_id: 1, track_title: 1, track_genres: 1, artist_name: 1 } }).toArray();
-        if (!result) {
+        const allTracks = await db.collection('tracks').find({}, { projection: { _id: 0, track_id: 1, track_title: 1, track_genres: 1, artist_name: 1 } }).toArray();
+        if (searchName !=''){
+            searchName = searchName.replace(/\s+/g, '').toUpperCase();
+            var nameResult = allTracks.filter(t => stringSim.compareTwoStrings(searchName, String(t.track_title).replace(/\s+/g, '').toUpperCase()) >= 0.75)
+            console.log(Object.keys(nameResult).length);
+        }
+        if (searchArtist !=''){
+            searchArtist = searchArtist.replace(/\s+/g, '').toUpperCase();
+            var artistResult = allTracks.filter(t => stringSim.compareTwoStrings(searchArtist, String(t.artist_name).replace(/\s+/g, '').toUpperCase()) >= 0.75)
+            console.log(Object.keys(artistResult).length);
+        }
+        if (!nameResult) {
             return res.status(404).json({ errors: [{ msg: 'No Tracks Found' }] });
         }
-        if (Object.keys(result).length > 15) {
-            const results = result.slice(0, 15);
-            res.json(results);
-        }
-        else {
-            res.json(result);
-        }
+        res.json(artistResult);
     }
     catch (err) {
         console.error(err.message);
