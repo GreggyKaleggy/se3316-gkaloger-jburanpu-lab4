@@ -11,6 +11,11 @@ const listSchema = new Schema({
         type: Number
     },
 
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'user'
+    },
+
     desc: {
         type: String
     },
@@ -33,7 +38,12 @@ const listSchema = new Schema({
             hidden: { Boolean },
             stars: { Number },
             review: { String }
-        }]
+        }],
+
+    modified: {
+        type: Date,
+        default: Date.now
+    }
 
 });
 module.exports = List = mongoose.model('list', listSchema);

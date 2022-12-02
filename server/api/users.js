@@ -11,6 +11,7 @@ const config = require('../config');
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     try {
+
         let user = await userSchema.findOne({ email });
         if (!user) {
             return res.status(400).json({ msg: 'Invalid Credentials' });
@@ -18,6 +19,9 @@ router.post('/login', async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(400).json({ msg: 'Invalid Credentials' });
+        }
+        if (user.deactivated) {
+            return res.status(400).json({ msg: 'The account is deactivated, please contact an admin' });
         }
         const payload = {
             user: {

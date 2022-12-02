@@ -10,19 +10,17 @@ const config = require('../config');
 //admin ability to make others admin
 router.put('/changestatus', auth, async (req, res) => {
     try {
-        if (req.user.isAdmin) {
-            const { email, isAdmin } = req.body;
-            let emailCheck = await User.findOne({ email: email });
-            if (!emailCheck) {
-                return res.status(400).json({ errors: [{ msg: 'Email address is not associated with any account' }] });
-            }
-            const user = await User.findOneAndUpdate({ email: email }, { $set: { isAdmin: isAdmin } }, { new: true });
-            res.json(user);
+        const currentUser = await userSchema.findById(req.user.id);
+        if (!currentUser.isAdmin) {
+            return res.status(401).json({ msg: 'You are not authorized to perform this action' });
         }
-
-        else {
-            return res.status(400).json({ errors: [{ msg: 'You are not authorized to change status' }] });
+        const { email, isAdmin } = req.body;
+        let emailCheck = await User.findOne({ email: email });
+        if (!emailCheck) {
+            return res.status(400).json({ errors: [{ msg: 'Email address is not associated with any account' }] });
         }
+        const user = await User.findOneAndUpdate({ email: email }, { $set: { isAdmin: isAdmin } }, { new: true });
+        res.json(user);
     }
     catch (err) {
         console.error(err.message);
@@ -31,8 +29,12 @@ router.put('/changestatus', auth, async (req, res) => {
 });
 
 //admin deactivating users
-router.put('/admin/deactivate', auth, async (req, res) => {
+router.put('/deactivate', auth, async (req, res) => {
     try {
+        const currentUser = await userSchema.findById(req.user.id);
+        if (!currentUser.isAdmin) {
+            return res.status(401).json({ msg: 'You are not authorized to perform this action' });
+        }
         const { email, deactivated } = req.body;
         let emailCheck = await User.findOne({ email: email });
         if (!emailCheck) {

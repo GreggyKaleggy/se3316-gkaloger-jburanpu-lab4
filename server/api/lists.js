@@ -6,6 +6,7 @@ const List = require('../schema/listSchema');
 const { db } = require('../schema/listSchema');
 const { check, validationResult } = require('express-validator');
 const abbrev = require('abbrev');
+const auth = require("../middleware/auth");
 
 
 //Get all lists
@@ -24,7 +25,7 @@ router.get('/', async (req, res) => {
 router.post('/new', [
     check('name', 'List name between 3 and 20 characters is required').not().isEmpty().isLength({ min: 3, max: 20 }),
     check('desc', 'Description can be a maximum 1000 characters').isLength({ min: 0, max: 1000 })
-], async (req, res) => {
+], auth, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         error = errors.array().map(error => error.msg);
@@ -59,7 +60,7 @@ router.post('/new', [
 router.put('/add', [
     check('name', 'List ID is required').not().isEmpty(),
     check('trackID', 'Track ID is required').not().isEmpty()
-], async (req, res) => {
+], auth, async (req, res) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
