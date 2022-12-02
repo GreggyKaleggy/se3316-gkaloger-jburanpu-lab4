@@ -75,9 +75,6 @@ router.get('/search/:title', async (req, res) => {
 
 router.post('/trackSearch', async (req, res) => {
     var {searchName, searchArtist, searchGenre} = req.body
-    console.log("searchName: " + searchName)
-    console.log("SearchArtist: " + searchArtist)
-    console.log("SearchGenre: " + searchGenre)
     try {
         const allTracks = await db.collection('tracks').find({}, { projection: { _id: 0, track_id: 1, track_title: 1, track_genres: 1, artist_name: 1 } }).toArray();
         if (searchName !== "") {
@@ -126,7 +123,6 @@ router.post('/trackSearch', async (req, res) => {
         if (!result) {
             return res.status(404).json({ errors: [{ msg: 'No Tracks Found' }] });
         }
-        console.log("# Tracks Found: " + Object.keys(result).length)
         res.json(result);
     }
     catch (err) {
