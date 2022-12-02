@@ -26,10 +26,14 @@ const listSchema = new Schema({
     }],
     reviews:
         [{
-            hidden: { Boolean },
-            username: { String },
-            stars: { Number },
-            review: { String }
+            hidden: Boolean,
+            username: String,
+            rating: Number,
+            review: String,
+            date: {
+                type: Date,
+                default: Date.now
+            }
         }],
     modified: {
         type: Date,
