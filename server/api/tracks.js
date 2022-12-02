@@ -75,82 +75,60 @@ router.get('/search/:title', async (req, res) => {
     }
 });
 
-
 router.get('/trackSearch', async (req, res) => {
     var searchName = req.query.name;
     var searchArtist = req.query.artist;
     var searchGenre = req.query.genre;
-    console.log(stringSim.compareTwoStrings("awol", "awo"))
     try {
         const allTracks = await db.collection('tracks').find({}, { projection: { _id: 0, track_id: 1, track_title: 1, track_genres: 1, artist_name: 1 } }).toArray();
-        var genreTracks = cloneDeep(allTracks.filter(t => t.track_genres !== ""));
-        genreTracks.forEach(t => t.track_genres = JSON.parse(t.track_genres.replace(/'/g, '"')));
-        console.log(genreTracks[0]);
-        console.log(genreTracks[0].track_genres[0].genre_title)
-        genreTracks[0].track_genres.forEach(g => console.log(g.genre_title))
-        if (searchName != '') {
+        if (typeof searchName !== "undefined") {
             searchName = searchName.replace(/\s+/g, '').toUpperCase();
-            var nameResult = cloneDeep(allTracks.filter(t => stringSim.compareTwoStrings(searchName, String(t.track_title).replace(/\s+/g, '').toUpperCase()) >= 0.70))
-            console.log(Object.keys(nameResult).length);
+            var nameResult = cloneDeep(allTracks.filter(t => stringSim.compareTwoStrings(searchName, String(t.track_title).replace(/\s+/g, '').toUpperCase()) >= 0.50))
         }
-        if (searchArtist != '') {
+
+
+        if (typeof searchArtist !== "undefined") {
             searchArtist = searchArtist.replace(/\s+/g, '').toUpperCase();
-            var artistResult = cloneDeep(allTracks.filter(t => stringSim.compareTwoStrings(searchArtist, String(t.artist_name).replace(/\s+/g, '').toUpperCase()) >= 0.70))
-            console.log(Object.keys(artistResult).length);
+            var artistResult = cloneDeep(allTracks.filter(t => stringSim.compareTwoStrings(searchArtist, String(t.artist_name).replace(/\s+/g, '').toUpperCase()) >= 0.50))
         }
 
-        if (searchGenre != '') {
+        if (typeof searchGenre !== "undefined") {
             searchGenre = searchGenre.replace(/\s+/g, '').toUpperCase();
-            var genreResult = cloneDeep(genreTracks.filter(t => stringSim.compareTwoStrings(searchGenre, String(t.track_genres[0].genre_title).replace(/\s+/g, '').toUpperCase()) >= 0.70))
-            //genreTracks.forEach(t => t.track_genres.forEach(g => console.log(g.genre_title)))
+            var genreTracks = cloneDeep(allTracks.filter(t => t.track_genres !== ""));
+            genreTracks.forEach(t => t.track_genres = JSON.parse(t.track_genres.replace(/'/g, '"')));
+            var genreResult = cloneDeep(genreTracks.filter(t => t.track_genres.some(g => stringSim.compareTwoStrings(searchGenre, String(g.genre_title).replace(/\s+/g, '').toUpperCase()) >= 0.50)))
         }
-        if (!nameResult) {
-            return res.status(404).json({ errors: [{ msg: 'No Tracks Found' }] });
-        }
-        res.json(genreResult);
-    }
-    catch (err) {
-        console.error(err.message);
-        res.status(500).send('Internal Server Error');
-    }
-});
 
-router.get('/trackSearch2', async (req, res) => {
-    var searchName = req.query.name;
-    var searchArtist = req.query.artist;
-    var searchGenre = req.query.genre;
-    try {
-        const allTracks = await db.collection('tracks').find({}, { projection: { _id: 0, track_id: 1, track_title: 1, track_genres: 1, artist_name: 1 } }).toArray();
+        if (typeof searchName !== "undefined" && typeof searchArtist !== "undefined" && typeof searchGenre !== "undefined") {
+            var result = nameResult.filter(t => artistResult.some(a => a.track_id === t.track_id) && genreResult.some(g => g.track_id === t.track_id));
+        }
+        else if (typeof searchName !== "undefined" && typeof searchArtist !== "undefined") {
+            var result = nameResult.filter(t => artistResult.some(a => a.track_id === t.track_id));
+        }
+        else if (typeof searchName !== "undefined" && typeof searchGenre !== "undefined") {
+            var result = nameResult.filter(t => genreResult.some(g => g.track_id === t.track_id));
+        }
+        else if (typeof searchArtist !== "undefined" && typeof searchGenre !== "undefined") {
+            var result = artistResult.filter(t => genreResult.some(g => g.track_id === t.track_id));
+        }
+        else if (typeof searchName !== "undefined") {
+            var result = nameResult;
+        }
+        else if (typeof searchArtist !== "undefined") {
+            var result = artistResult;
+        }
+        else if (typeof searchGenre !== "undefined") {
+            var result = genreResult;
+        }
+        else {
+            return res.status(404).json({ errors: [{ msg: 'No input provided' }] });
+        }
 
-        //search by name in tracks, using string similarity to find matches with a threshold of 0.7 or higher 
-        if (searchName != '') {
-            searchName = searchName.replace(/\s+/g, '').toUpperCase();
-            var nameResult = cloneDeep(allTracks.filter(t => stringSim.compareTwoStrings(searchName, String(t.track_title).replace(/\s+/g, '').toUpperCase()) >= 0.70))
-        }
-        //search by artist in tracks, using string similarity to find matches with a threshold of 0.7 or higher
-        if (searchArtist != '') {
-            searchArtist = searchArtist.replace(/\s+/g, '').toUpperCase();
-            var artistResult = cloneDeep(allTracks.filter(t => stringSim.compareTwoStrings(searchArtist, String(t.artist_name).replace(/\s+/g, '').toUpperCase()) >= 0.70))
-        }
-        //search through all genres in each track, using string similarity to find matches with a threshold of 0.7 or higher
-        if (searchGenre != '') {
-            searchGenre = searchGenre.replace(/\s+/g, '').toUpperCase();
-            var genreResult = cloneDeep(allTracks.filter(t => {
-                var genres = JSON.parse(t.track_genres.replace(/'/g, '"'));
-                return genres.some(g => stringSim.compareTwoStrings(searchGenre, String(g.genre_title).replace(/\s+/g, '').toUpperCase()) >= 0.70)
-            }))
-        }
-        //only keep the tracks that match all three search criteria
-        if (searchName != '' && searchArtist != '' && searchGenre != '') {
-            var result = nameResult.filter(t => artistResult.some(a => a.track_id == t.track_id) && genreResult.some(g => g.track_id == t.track_id))
-        }
-        //return the result
         if (!result) {
             return res.status(404).json({ errors: [{ msg: 'No Tracks Found' }] });
         }
         res.json(result);
     }
-
     catch (err) {
         console.error(err.message);
         res.status(500).send('Internal Server Error');
