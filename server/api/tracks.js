@@ -5,6 +5,7 @@ const csv = require("csv-parser");
 const { getAlbums } = require('./albums');
 const mongoose = require('mongoose');
 const db = mongoose.connection;
+const stringSim = require('string-similarity');
 
 
 //route for /api/tracks
@@ -58,6 +59,31 @@ router.get('/search/:title', async (req, res) => {
         const search = req.params.title;
         const regex = new RegExp(search, 'i')
         const result = await db.collection('tracks').find({ track_title: { $regex: regex } }).toArray();
+        if (!result) {
+            return res.status(404).json({ errors: [{ msg: 'No Tracks Found' }] });
+        }
+        if (Object.keys(result).length > 15) {
+            const results = result.slice(0, 15);
+            res.json(results);
+        }
+        else {
+            res.json(result);
+        }
+    }
+    catch (err) {
+        console.error(err.message);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
+router.get('/searchTracks', async (req, res) => {
+    const searchName = req.query.name;
+    const searchArtist = req.query.artist;
+    const searchGenre = req.query.genre;
+
+    try {
+        const allTitles = await db.collection('tracks').find({}, { projection: { _id: 0, track_id: 1, track_title: 1, track_genres: 1, artist_name: 1 } }).toArray();
         if (!result) {
             return res.status(404).json({ errors: [{ msg: 'No Tracks Found' }] });
         }
