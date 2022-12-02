@@ -14,6 +14,13 @@ const userSchema = require('../schema/userSchema');
 router.get('/', async (req, res) => {
     try {
         const lists = await List.find({ isPrivate: false });
+        for (let i = 0; i < lists.length; i++) {
+            for (let j = 0; j < lists[i].reviews.length; j++) {
+                if (lists[i].reviews[j].hidden) {
+                    lists[i].reviews.splice(j, 1);
+                }
+            }
+        }
         res.json(lists);
     }
     catch (err) {
@@ -189,8 +196,8 @@ router.delete('/delete/:name/:trackID', auth, async (req, res) => {
 
 //leave reviews on a list
 router.post('/review/:name', [
-    check('stars', 'Give the list a rating of from 1 to 5. 1 being the lowest, 5 being the highest').not().isEmpty().isInt({ min: 1, max: 5 }),
-    check('review', 'Review can be a maximum 200 characters').isLength({ min: 0, max: 200 })
+    check('rating', 'Rating from 1 to 5 is required').not().isEmpty().isInt({ min: 1, max: 5 }),
+    check('review', 'Review is optional upto 200 characters').not().isEmpty().isLength({ min: 0, max: 200 })
 ], auth, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -198,20 +205,21 @@ router.post('/review/:name', [
         return res.status(400).json({ error });
     }
     try {
-        const list = await List.find({ isPrivate: false });
-        if (!list) {
-            return res.status(400).json({ errors: [{ msg: "List doesn't exist" }] });
+        const reviewer = await User.findById(req.user.id)
+        const { rating, review } = req.body;
+        const reviews = {
+            username: reviewer.username,
+            rating,
+            review,
+            hidden: false
         }
-        const user = await User.findById(req.user.id).select('-password');
-        const username = user.username;
-        const { stars, review } = req.body;
-        const newReview = {
-            user: username,
-            stars: stars,
-            review: review
+        const list = await List.findOne({ name: req.params.name });
+        for (let i = 0; i < list.reviews.length; i++) {
+            if (list.reviews[i].username == reviewer.username) {
+                return res.status(400).json({ errors: [{ msg: "You have already reviewed this list" }] });
+            }
         }
-        console.log(newReview);
-        list.reviews.push(newReview);
+        list.reviews.unshift(reviews);
         await list.save();
         res.json(list);
     }
@@ -220,8 +228,6 @@ router.post('/review/:name', [
         res.status(500).send('Internal Server Error');
     }
 })
-
-
 
 module.exports = { router };
 
