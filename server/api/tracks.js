@@ -6,7 +6,7 @@ const { getAlbums } = require('./albums');
 const mongoose = require('mongoose');
 const db = mongoose.connection;
 const stringSim = require('string-similarity');
-const lodash = require('lodash');
+var cloneDeep = require('lodash.clonedeep');
 
 //route for /api/tracks
 router.get('/', async (req, res) => {
@@ -83,25 +83,25 @@ router.get('/trackSearch', async (req, res) => {
     console.log(stringSim.compareTwoStrings("awol", "awo"))
     try {
         const allTracks = await db.collection('tracks').find({}, { projection: { _id: 0, track_id: 1, track_title: 1, track_genres: 1, artist_name: 1 } }).toArray();
-        var genreTracks = structuredClone(allTracks.filter(t => t.track_genres !== ""));
+        var genreTracks = cloneDeep(allTracks.filter(t => t.track_genres !== ""));
         genreTracks.forEach(t => t.track_genres = JSON.parse(t.track_genres.replace(/'/g, '"')));
         console.log(genreTracks[0]);
         console.log(genreTracks[0].track_genres[0].genre_title)
         genreTracks[0].track_genres.forEach(g => console.log(g.genre_title))
         if (searchName != '') {
             searchName = searchName.replace(/\s+/g, '').toUpperCase();
-            var nameResult = structuredClone(allTracks.filter(t => stringSim.compareTwoStrings(searchName, String(t.track_title).replace(/\s+/g, '').toUpperCase()) >= 0.70))
+            var nameResult = cloneDeep(allTracks.filter(t => stringSim.compareTwoStrings(searchName, String(t.track_title).replace(/\s+/g, '').toUpperCase()) >= 0.70))
             console.log(Object.keys(nameResult).length);
         }
         if (searchArtist != '') {
             searchArtist = searchArtist.replace(/\s+/g, '').toUpperCase();
-            var artistResult = structuredClone(allTracks.filter(t => stringSim.compareTwoStrings(searchArtist, String(t.artist_name).replace(/\s+/g, '').toUpperCase()) >= 0.70))
+            var artistResult = cloneDeep(allTracks.filter(t => stringSim.compareTwoStrings(searchArtist, String(t.artist_name).replace(/\s+/g, '').toUpperCase()) >= 0.70))
             console.log(Object.keys(artistResult).length);
         }
 
         if (searchGenre != '') {
             searchGenre = searchGenre.replace(/\s+/g, '').toUpperCase();
-            var genreResult = structuredClone(genreTracks.filter(t => stringSim.compareTwoStrings(searchGenre, String(t.track_genres[0].genre_title).replace(/\s+/g, '').toUpperCase()) >= 0.70))
+            var genreResult = cloneDeep(genreTracks.filter(t => stringSim.compareTwoStrings(searchGenre, String(t.track_genres[0].genre_title).replace(/\s+/g, '').toUpperCase()) >= 0.70))
             //genreTracks.forEach(t => t.track_genres.forEach(g => console.log(g.genre_title)))
         }
         if (!nameResult) {
@@ -125,17 +125,17 @@ router.get('/trackSearch2', async (req, res) => {
         //search by name in tracks, using string similarity to find matches with a threshold of 0.7 or higher 
         if (searchName != '') {
             searchName = searchName.replace(/\s+/g, '').toUpperCase();
-            var nameResult = structuredClone(allTracks.filter(t => stringSim.compareTwoStrings(searchName, String(t.track_title).replace(/\s+/g, '').toUpperCase()) >= 0.70))
+            var nameResult = cloneDeep(allTracks.filter(t => stringSim.compareTwoStrings(searchName, String(t.track_title).replace(/\s+/g, '').toUpperCase()) >= 0.70))
         }
         //search by artist in tracks, using string similarity to find matches with a threshold of 0.7 or higher
         if (searchArtist != '') {
             searchArtist = searchArtist.replace(/\s+/g, '').toUpperCase();
-            var artistResult = structuredClone(allTracks.filter(t => stringSim.compareTwoStrings(searchArtist, String(t.artist_name).replace(/\s+/g, '').toUpperCase()) >= 0.70))
+            var artistResult = cloneDeep(allTracks.filter(t => stringSim.compareTwoStrings(searchArtist, String(t.artist_name).replace(/\s+/g, '').toUpperCase()) >= 0.70))
         }
         //search through all genres in each track, using string similarity to find matches with a threshold of 0.7 or higher
         if (searchGenre != '') {
             searchGenre = searchGenre.replace(/\s+/g, '').toUpperCase();
-            var genreResult = structuredClone(allTracks.filter(t => {
+            var genreResult = cloneDeep(allTracks.filter(t => {
                 var genres = JSON.parse(t.track_genres.replace(/'/g, '"'));
                 return genres.some(g => stringSim.compareTwoStrings(searchGenre, String(g.genre_title).replace(/\s+/g, '').toUpperCase()) >= 0.70)
             }))
