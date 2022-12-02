@@ -6,11 +6,9 @@ const UserSchema = new Schema({
         type: Boolean,
         default: false
     },
-    name: {
+    username: {
         type: String,
-        required: true,
-        min: 6,
-        max: 30
+        required: true
     },
     email: {
         type: String,
@@ -23,6 +21,10 @@ const UserSchema = new Schema({
     deactivated: {
         type: Boolean,
         required: true,
+        default: false
+    },
+    validated: {
+        type: Boolean,
         default: false
     }
 });

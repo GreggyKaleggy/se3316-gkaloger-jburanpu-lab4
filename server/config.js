@@ -1,4 +1,4 @@
-const jwtSecret = "testSecret";
+const jwtSecret = "lab4Secret";
 module.exports = {
     jwtSecret
 }
