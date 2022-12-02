@@ -85,7 +85,9 @@ router.get('/trackSearch', async (req, res) => {
         const allTracks = await db.collection('tracks').find({}, { projection: { _id: 0, track_id: 1, track_title: 1, track_genres: 1, artist_name: 1 } }).toArray();
         var genreTracks = structuredClone(allTracks.filter(t => t.track_genres !==""));
         genreTracks.forEach( t => t.track_genres = JSON.parse(t.track_genres.replace(/'/g, '"')));
-        console.log(genreTracks[291]);
+        console.log(genreTracks[0]);
+        console.log(genreTracks[0].track_genres[0].genre_title)
+        genreTracks[0].track_genres.forEach(g => console.log(g.genre_title))
         if (searchName !=''){
             searchName = searchName.replace(/\s+/g, '').toUpperCase();
             var nameResult = structuredClone(allTracks.filter(t => stringSim.compareTwoStrings(searchName, String(t.track_title).replace(/\s+/g, '').toUpperCase()) >= 0.70))
@@ -96,10 +98,16 @@ router.get('/trackSearch', async (req, res) => {
             var artistResult = structuredClone(allTracks.filter(t => stringSim.compareTwoStrings(searchArtist, String(t.artist_name).replace(/\s+/g, '').toUpperCase()) >= 0.70))
             console.log(Object.keys(artistResult).length);
         }
+
+        if (searchGenre !=''){
+            searchGenre = searchGenre.replace(/\s+/g, '').toUpperCase();
+            var genreResult = structuredClone(genreTracks.filter(t => stringSim.compareTwoStrings(searchGenre, String(t.track_genres[0].genre_title).replace(/\s+/g, '').toUpperCase()) >= 0.70))
+            //genreTracks.forEach(t => t.track_genres.forEach(g => console.log(g.genre_title)))
+        } 
         if (!nameResult) {
             return res.status(404).json({ errors: [{ msg: 'No Tracks Found' }] });
         }
-        res.json(nameResult);
+        res.json(genreResult);
     }
     catch (err) {
         console.error(err.message);
