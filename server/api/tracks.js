@@ -80,22 +80,26 @@ router.get('/trackSearch', async (req, res) => {
     var searchName = req.query.name;
     var searchArtist = req.query.artist;
     var searchGenre = req.query.genre;
+    console.log(stringSim.compareTwoStrings("awol","awo"))
     try {
         const allTracks = await db.collection('tracks').find({}, { projection: { _id: 0, track_id: 1, track_title: 1, track_genres: 1, artist_name: 1 } }).toArray();
+        var genreTracks = structuredClone(allTracks.filter(t => t.track_genres !==""));
+        genreTracks.forEach( t => t.track_genres = JSON.parse(t.track_genres.replace(/'/g, '"')));
+        console.log(genreTracks[291]);
         if (searchName !=''){
             searchName = searchName.replace(/\s+/g, '').toUpperCase();
-            var nameResult = allTracks.filter(t => stringSim.compareTwoStrings(searchName, String(t.track_title).replace(/\s+/g, '').toUpperCase()) >= 0.75)
+            var nameResult = structuredClone(allTracks.filter(t => stringSim.compareTwoStrings(searchName, String(t.track_title).replace(/\s+/g, '').toUpperCase()) >= 0.70))
             console.log(Object.keys(nameResult).length);
         }
         if (searchArtist !=''){
             searchArtist = searchArtist.replace(/\s+/g, '').toUpperCase();
-            var artistResult = allTracks.filter(t => stringSim.compareTwoStrings(searchArtist, String(t.artist_name).replace(/\s+/g, '').toUpperCase()) >= 0.75)
+            var artistResult = structuredClone(allTracks.filter(t => stringSim.compareTwoStrings(searchArtist, String(t.artist_name).replace(/\s+/g, '').toUpperCase()) >= 0.70))
             console.log(Object.keys(artistResult).length);
         }
         if (!nameResult) {
             return res.status(404).json({ errors: [{ msg: 'No Tracks Found' }] });
         }
-        res.json(artistResult);
+        res.json(nameResult);
     }
     catch (err) {
         console.error(err.message);
