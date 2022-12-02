@@ -6,12 +6,10 @@ function GenresPage() {
   const [genres, setGenres] = useState([])
 
   function GetGenres(e){
-    React.useEffect(()=>{
       fetch('/api/genres')
         .then(response => response.json())
         .then(data =>
           setGenres(data))
-      }, []) 
   }
 
 

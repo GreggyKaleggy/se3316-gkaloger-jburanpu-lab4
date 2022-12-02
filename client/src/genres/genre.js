@@ -3,19 +3,23 @@ import React from "react";
 
 export default function Genre ({genres}){
     return(
-        <div>
+        <>
+        <div className="GenreBox">
             <div>
                 Genre Name: {genres.title}
             </div>
-            <br/>
             <div>
-                Tracks: {genres.parent}
+                Genre ID: {genres.genre_id}
             </div>
-            <br/>
             <div>
-                Favourite: {genres.parent}
+                Parent Genre ID: {genres.parent}
             </div>
-            <br/>
+            <div>
+                Number of tracks in Genre: {genres["#tracks"]}
+            </div>
+            
         </div>
+        <br/>
+        </>
     )
 }
