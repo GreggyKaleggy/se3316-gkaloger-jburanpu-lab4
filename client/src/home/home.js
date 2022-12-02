@@ -1,13 +1,33 @@
 import React, {useState, useRef} from 'react';
 import './home.css';
+import TrackList from './trackList';
 
 function Home() {
+  const [tracks, setTracks] = useState([])
   const trackNameRef = useRef()
   const trackArtistRef = useRef()
   const trackGenreRef = useRef()
 
-  function trackSearch(e){
+  async function trackSearch(e){
+    const name = trackNameRef.current.value
+    const artist = trackArtistRef.current.value
+    const genre = trackGenreRef.current.value
+    setTracks([])
 
+    fetch('/api/tracks/trackSearch', {
+      method: 'POST',
+      headers: {
+        'Accept': '/',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        searchName: name,
+        searchArtist: artist,
+        searchGenre: genre
+      })
+    }).then(response => response.json())
+      .then(data =>
+        setTracks(data))
   }
 
   return (
@@ -31,8 +51,9 @@ function Home() {
             <input ref = {trackNameRef} type="text" name="trackName" placeholder="Track Name"/>
             <input ref = {trackArtistRef} type="text" name="trackArtist" placeholder="Artist Name"/>
             <input ref = {trackGenreRef} type="text" name="trackGenre" placeholder="Track Genre"/>
-            <input type="button" defaultValue="Search" onClick={trackSearch()} />
+            <input type="button" defaultValue="Search" onClick={trackSearch} />
     </div>
+    <TrackList tracks = {tracks}/>
     </>
   );
 }
