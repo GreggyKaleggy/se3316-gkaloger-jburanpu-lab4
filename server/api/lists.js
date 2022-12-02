@@ -52,6 +52,10 @@ router.post('/new', [
     check('desc', 'Description can be a maximum 1000 characters').isLength({ min: 0, max: 1000 }),
     check('isPrivate', 'Please clarify is the list is private or public').isBoolean()
 ], auth, async (req, res) => {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user.verified) {
+        return res.status(400).json({ msg: 'Please verify your email address to create a list' });
+    }
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         error = errors.array().map(error => error.msg);
@@ -91,7 +95,6 @@ router.put('/add', [
     check('name', 'List ID is required').not().isEmpty(),
     check('trackID', 'Track ID is required').not().isEmpty()
 ], auth, async (req, res) => {
-
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         error = errors.array().map(error => error.msg);
@@ -143,6 +146,7 @@ router.put('/add', [
 
 //Delete a list
 router.delete('/delete/:name', auth, async (req, res) => {
+    const user = await User.findById(req.user.id).select('-password');
     try {
         const userLists = await List.find({ user: req.user.id });
         const list = await List.findOne({ name: req.params.name });
