@@ -8,10 +8,10 @@ const userSchema = require('../schema/userSchema');
 const auth = require("../middleware/auth");
 const config = require('../config');
 
+
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     try {
-
         let user = await userSchema.findOne({ email });
         if (!user) {
             return res.status(400).json({ msg: 'Invalid Credentials' });
@@ -22,6 +22,9 @@ router.post('/login', async (req, res) => {
         }
         if (user.deactivated) {
             return res.status(400).json({ msg: 'The account is deactivated, please contact an admin' });
+        }
+        if (!user.verified) {
+            return res.status(400).json({ msg: 'Please verify your email address for full functionality' });
         }
         const payload = {
             user: {
@@ -68,7 +71,7 @@ router.post('/register', [
         let error = user.validateSync();
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(password, salt);
-        await user.save()
+        await user.save();
         const payload = {
             user: {
                 id: user.id
@@ -77,8 +80,7 @@ router.post('/register', [
         jwt.sign(payload, config.jwtSecret, { expiresIn: 360000 }, (err, token) => {
             if (err) throw err;
             res.json({ token });
-        }
-        );
+        });
     }
     catch (err) {
         console.error(err.message);
@@ -101,6 +103,13 @@ router.put('/changepassword', [
         if (!emailCheck) {
             return res.status(400).json({ errors: [{ msg: 'Email address is not associated with any account' }] });
         }
+        const user = await User.findById(req.user.id).select('-password');
+        if (!user.verified) {
+            return res.status(400).json({
+                msg: 'Only verified users can change their password, please verify your email by clicking here:' +
+                    'http://localhost:3001/verify/'
+            });
+        }
         const isMatch = await bcrypt.compare(oldPassword, emailCheck.password);
         if (!isMatch) {
             return res.status(400).json({ errors: [{ msg: 'The old password you entered is incorrect' }] });
@@ -113,6 +122,49 @@ router.put('/changepassword', [
         emailCheck.password = await bcrypt.hash(newPassword, salt);
         await emailCheck.save()
         res.json({ msg: 'Password changed successfully' });
+    }
+    catch (err) {
+        console.error(err.message);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.get('/verify', auth, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+        if (user.verified) {
+            return res.status(400).json({ msg: 'Account already verified' });
+        }
+        const link = '/api/users/verify/' + user.email + '/' + req.header('x-auth-token');
+        res.json({ msg: 'Please verify your email by clicking here:' + link });
+
+    }
+    catch (err) {
+        console.error(err.message);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.get('/verify/:email/:token', async (req, res) => {
+    try {
+        const { email, token } = req.params;
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ msg: 'Link is invalid' });
+        }
+        if (user.verified) {
+            return res.status(400).json({ msg: 'Account already verified' });
+        }
+        jwt.verify(token, config.jwtSecret, async (err, decoded) => {
+            if (err) {
+                return res.status(400).json({ msg: 'Link is invalid' });
+            }
+            else {
+                user.verified = true;
+                await user.save();
+                res.json({ msg: 'Account verified successfully' });
+            }
+        });
     }
     catch (err) {
         console.error(err.message);
