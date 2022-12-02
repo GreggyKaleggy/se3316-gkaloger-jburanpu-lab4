@@ -24,6 +24,9 @@ const listSchema = new Schema({
         trackID: { type: Number },
         trackduration: { type: Number }
     }],
+    averageRating: {
+        type: Number
+    },
     reviews:
         [{
             hidden: Boolean,

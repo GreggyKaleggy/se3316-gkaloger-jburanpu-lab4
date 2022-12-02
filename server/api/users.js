@@ -145,7 +145,7 @@ router.get('/verify', auth, async (req, res) => {
     }
 });
 
-router.get('/verify/:email/:token', async (req, res) => {
+router.get('/verify/:email/:token', auth, async (req, res) => {
     try {
         const { email, token } = req.params;
         const user = await User.findOne({ email });
