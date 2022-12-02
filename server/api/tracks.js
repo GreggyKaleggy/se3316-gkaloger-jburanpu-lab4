@@ -12,6 +12,7 @@ router.get('/', async (req, res) => {
     try {
         const result = await db.collection('tracks').find().toArray();
         res.json(result)
+        console.log(result)
     }
     catch (err) {
         console.error(err.message);
