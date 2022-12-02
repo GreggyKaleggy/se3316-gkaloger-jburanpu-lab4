@@ -1,0 +1,91 @@
+const express = require('express');
+const Docs = require('../schema/documentSchema');
+const router = express.Router();
+const auth = require('../middleware/auth');
+const { check, validationResult } = require('express-validator');
+const userSchema = require('../schema/userSchema');
+router.use(express.json())
+
+
+// @route   GET api/docs
+// @desc    Get all docs
+// @access  Public
+router.get('/', auth, async (req, res) => {
+    try {
+        const currentUser = await userSchema.findById(req.user.id);
+        if (!currentUser.isAdmin) {
+            return res.status(401).json({ msg: 'You are not authorized to perform this action' });
+        }
+        const docs = await Docs.find();
+        res.json(docs);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+router.post('/newdoc',
+    check('title', 'Title is required').not().isEmpty(),
+    check('content', 'Content is required, up to 1000 characters').not().isEmpty().isLength({ min: 1, max: 1000 }),
+    auth, async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        try {
+            const currentUser = await userSchema.findById(req.user.id);
+            if (!currentUser.isAdmin) {
+                return res.status(401).json({ msg: 'You are not authorized to perform this action' });
+            }
+            const { title, content } = req.body;
+            const newDoc = new Docs({
+                title,
+                content
+            });
+            const doc = await newDoc.save();
+            res.json(doc);
+        } catch (err) {
+            console.error(err.message);
+            res.status(500).send('Server Error');
+        }
+    });
+
+router.put('/editdoc/:name', [
+    check('title', 'Title is required').not().isEmpty(),
+    check('content', 'Content is required, up to 1000 characters').not().isEmpty().isLength({ min: 1, max: 1000 })
+], auth, async (req, res) => {
+    try {
+        const currentUser = await userSchema.findById(req.user.id);
+        if (!currentUser.isAdmin) {
+            return res.status(401).json({ msg: 'You are not authorized to perform this action' });
+        }
+        const { title, content } = req.body;
+        const doc = await Docs.findOneAndUpdate({ title: req.params.name }, { $set: { title, content } }, { new: true });
+        if (!doc) {
+            return res.status(404).json({ msg: 'Document not found' });
+        }
+        res.json(doc);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+router.delete('/deletedoc/:name', auth, async (req, res) => {
+    try {
+        const currentUser = await userSchema.findById(req.user.id);
+        if (!currentUser.isAdmin) {
+            return res.status(401).json({ msg: 'You are not authorized to perform this action' });
+        }
+        const doc = await Docs.findOneAndDelete({ title: req.params.name });
+        if (!doc) {
+            return res.status(404).json({ msg: 'Document not found' });
+        }
+        res.json("Document deleted");
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+module.exports = { router };
