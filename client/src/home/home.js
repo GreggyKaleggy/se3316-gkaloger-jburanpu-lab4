@@ -3,6 +3,7 @@ import './home.css';
 import TrackList from './trackList';
 
 function Home() {
+  const [serverStatus, setServerStatus] = useState("")
   const [tracks, setTracks] = useState([])
   const trackNameRef = useRef()
   const trackArtistRef = useRef()
@@ -13,7 +14,8 @@ function Home() {
     const artist = trackArtistRef.current.value
     const genre = trackGenreRef.current.value
     setTracks([])
-
+    
+    setServerStatus("Loading...")
     fetch('/api/tracks/trackSearch', {
       method: 'POST',
       headers: {
@@ -25,9 +27,17 @@ function Home() {
         searchArtist: artist,
         searchGenre: genre
       })
-    }).then(response => response.json())
-      .then(data =>
-        setTracks(data))
+    }).then(response =>
+      response.json())
+      .then(data =>{
+        if (data.errors){
+          setServerStatus(`Error: ${data.errors[0].msg}`)
+        } else {
+          setServerStatus("")
+          setTracks(data)
+        }
+      }
+        )
   }
 
   return (
@@ -53,6 +63,7 @@ function Home() {
             <input ref = {trackGenreRef} type="text" name="trackGenre" placeholder="Track Genre"/>
             <input type="button" defaultValue="Search" onClick={trackSearch} />
     </div>
+    <div>{serverStatus}</div>
     <TrackList tracks = {tracks}/>
     </>
   );

@@ -15,11 +15,6 @@ export default function Track ({tracks}){
     } else {
         genres = "No Genres Given"
     }
-    
-    
-    
-
-
     return(
     <>
     <div className="TrackBox">
