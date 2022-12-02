@@ -40,7 +40,8 @@ const listSchema = new Schema({
         default: Date.now
     },
     isPrivate: {
-        type: Boolean
+        type: Boolean,
+        default: true
     }
 
 });

@@ -59,7 +59,7 @@ router.post('/new', [
     }
     try {
 
-        const { name, desc, isPrivate } = req.body;
+        const { name, desc } = req.body;
         //if name is already taken, return error
         const list = await List.findOne
             ({ name: name });
@@ -71,13 +71,13 @@ router.post('/new', [
             user: req.user.id,
             name: name,
             duration: 0,
-            desc: desc,
-            isPrivate: isPrivate,
+            desc: desc
 
         });
 
         await newList.save();
-        res.json(newList);
+        //redirect user to /mylists
+
     }
     catch (err) {
         console.error(err.message);
