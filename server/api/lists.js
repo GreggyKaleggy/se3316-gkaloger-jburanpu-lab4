@@ -67,7 +67,8 @@ router.post('/new', [
         if (list) {
             return res.status(400).json({ error: 'List name already taken' });
         }
-        if (lists.length > 20) {
+        numberOfLists = await List.countDocuments({ user: user.id });
+        if (numberOfLists >= 20) {
             return res.status(400).json({ error: 'You have reached the maximum number of lists' });
         }
         const newList = new List({
