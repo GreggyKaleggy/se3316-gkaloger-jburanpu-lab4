@@ -14,14 +14,15 @@ const userSchema = require('../schema/userSchema');
 router.get('/', async (req, res) => {
     try {
         const lists = await List.find({ isPrivate: false });
-        for (let i = 0; i < lists.length; i++) {
-            for (let j = 0; j < lists[i].reviews.length; j++) {
-                if (lists[i].reviews[j].hidden) {
-                    lists[i].reviews.splice(j, 1);
-                }
-            }
+
+        if (!req.header('x-auth-token')) {
+            const firstTen = lists.slice(0, 10);
+            console.log(firstTen.length);
+            res.json(firstTen);
+
+        } else {
+            res.json(lists);
         }
-        res.json(lists);
     }
     catch (err) {
         console.error(err.message);
