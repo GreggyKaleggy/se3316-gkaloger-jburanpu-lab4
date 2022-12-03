@@ -48,9 +48,8 @@ router.get('/mylists', auth, async (req, res) => {
 
 //Make a new list
 router.post('/new', [
-    check('name', 'List name between 3 and 20 characters is required').not().isEmpty().isLength({ min: 3, max: 20 }),
+    check('name', 'List name between 3 and 20 characters is required').not().isEmpty().isLength({ min: 3, max: 30 }),
     check('desc', 'Description can be a maximum 1000 characters').isLength({ min: 0, max: 1000 }),
-    check('isPrivate', 'Please clarify is the list is private or public').isBoolean()
 ], auth, async (req, res) => {
     const user = await User.findById(req.user.id).select('-password');
     if (!user.verified) {
@@ -80,7 +79,7 @@ router.post('/new', [
         });
 
         await newList.save();
-        //redirect user to /mylists
+        res.json(newList);
 
     }
     catch (err) {
@@ -203,6 +202,10 @@ router.post('/review/:name', [
     check('rating', 'Rating from 1 to 5 is required').not().isEmpty().isInt({ min: 1, max: 5 }),
     check('review', 'Review is optional upto 200 characters').not().isEmpty().isLength({ min: 0, max: 200 })
 ], auth, async (req, res) => {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user.verified) {
+        return res.status(400).json({ msg: 'Unverified users cannot leave reviews' });
+    }
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         error = errors.array().map(error => error.msg);
@@ -223,9 +226,33 @@ router.post('/review/:name', [
                 return res.status(400).json({ errors: [{ msg: "You have already reviewed this list" }] });
             }
         }
+        list.averageRating = 0
+        for (let i = 0; i < list.reviews.length; i++) {
+            const totalRating = list.reviews[i].rating;
+            list.averageRating += totalRating;
+        }
+        list.averageRating = list.averageRating / list.reviews.length;
         list.reviews.unshift(reviews);
         await list.save();
         res.json(list);
+    }
+    catch (err) {
+        console.error(err.message);
+        res.status(500).send('Internal Server Error');
+    }
+})
+
+router.put('/changeprivacy/:name/:value', auth, async (req, res) => {
+    try {
+        const value = req.params.value;
+        const list = await List.findOne({ name: req.params.name });
+        if (!list) {
+            return res.status(400).json({ errors: [{ msg: "List doesn't exist" }] });
+        }
+        list.isPrivate = value;
+        await list.save();
+        res.json(list);
+
     }
     catch (err) {
         console.error(err.message);
