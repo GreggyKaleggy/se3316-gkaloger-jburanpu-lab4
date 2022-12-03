@@ -1,7 +1,7 @@
 import React, {useState, useRef, useEffect} from 'react';
 import './home.css';
-import TrackList from './trackList';
-import PublicLists from './publicLists';
+import TrackList from '../modules/trackList';
+import ViewLists from '../modules/viewLists';
 
 function Home() {
   const [serverStatus, setServerStatus] = useState("")
@@ -77,7 +77,7 @@ function Home() {
     <h2>Recent Public Playlists</h2>
     <button onClick = {getLists}>Refresh</button>
     <hr/>
-    <PublicLists lists = {lists}/>
+    <ViewLists lists = {lists}/>
     </div>
     </>
   );

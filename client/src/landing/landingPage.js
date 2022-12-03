@@ -1,6 +1,8 @@
 import './landing.css';
 
 function Landing() {
+  const login = localStorage.getItem("isLoggedIn");
+
   return (
     <div>
       <h1>3316 Lab 4 - Landing Page</h1>
@@ -8,7 +10,7 @@ function Landing() {
       <hr />
       <h2>Log-in</h2>
       <h3>Unauthenticated users have limited functionality! Make sure to authenticate your account!</h3>
-      <p>Don't have an account? <a href="/register">Register</a> today!</p>
+      {!login ? <p>Want to join? <a href="/register">Register</a> or <a href="/login">Log in</a> today!</p> : null}
       <h2>Unauthenticated user Functionality:</h2>
       <hr />
       <h2>Home</h2>

@@ -47,28 +47,26 @@ export default function List ({list}){
             <button onClick={showDetails}>View Details</button> 
             <button onClick= {showReviews}>View Reviews</button>
             {detState ? <div>
+                <h4>Additional Details</h4>
                 <div>
                 Description: {list.desc}
                 </div>
                 <div>
                 Private List: {String(list.isPrivate)}
                 </div>
-                <hr />
                 <h4>
                 Track List: 
                 </h4>
                 <TrackList tracks = {list.tracklist}/>
-                <hr />
             </div> : null}
             {revState ? <div>
-                <hr />
                 <h4>
                 Reviews: 
                 </h4>
                 <ReviewList reviews = {list.reviews}/>
-                <hr />
             </div> : null}
         </div>
+        <hr />
         <br/>
         </>
     )

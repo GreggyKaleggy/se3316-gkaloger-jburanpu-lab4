@@ -1,5 +1,5 @@
 import './App.css';
-import Topnav from './topnav';
+import Topnav from './modules/topnav';
 import Landing from './landing/landingPage';
 import Home from './home/home';
 import ArtistsPage from './artists/artistsPage';
