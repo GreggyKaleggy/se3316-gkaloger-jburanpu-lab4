@@ -6,13 +6,13 @@ export default function CreateList (){
         <>
         <h2>Create a List!</h2>
         <hr/>
-        <input type="text" name="trackName" placeholder="List Name"/>
+        <input type="text" placeholder="List Name"/>
         <br/>
-        <input type="text" name="trackArtist" placeholder="Description (Optional)"/>
+        <input type="text" placeholder="Description (Optional)"/>
         <br/>
-        <input type="text" name="trackGenre" placeholder="Track Genre"/>
+        <input type="text" placeholder="Tracks"/>
         <br/>
-        <input type="button" defaultValue="Search"/>
+        <input type="button" defaultValue="Submit"/>
         </>
     )
 }

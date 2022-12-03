@@ -43,7 +43,6 @@ router.get('/mylists', auth, async (req, res) => {
     }
 });
 
-
 //Make a new list
 router.post('/new', [
     check('name', 'List name between 3 and 20 characters is required').not().isEmpty().isLength({ min: 3, max: 30 }),
@@ -52,18 +51,18 @@ router.post('/new', [
     const user = await User.findById(req.user.id).select('-password');
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        error = errors.array().map(error => error.msg);
-        return res.status(400).json({ error });
+        var errorMsg = errors.array().map(error => error.msg);
+        return res.status(400).json({ errors:[{msg: errorMsg}] });
     }
     try {
         const { name, desc } = req.body;
         const list = await List.findOne({ name: name });
         if (list) {
-            return res.status(400).json({ error: 'List name already taken' });
+            return res.status(400).json({ errors: [{msg: 'List name already taken'}]});
         }
         numberOfLists = await List.countDocuments({ user: user.id });
         if (numberOfLists >= 20) {
-            return res.status(400).json({ error: 'You have reached the maximum number of lists' });
+            return res.status(400).json({ errors: [{msg:'You have reached the maximum number of lists'}] });
         }
         const newList = new List({
             username: user.username,
