@@ -76,6 +76,7 @@ function Home() {
     <div>
     <h2>Recent Public Playlists</h2>
     <button onClick = {getLists}>Refresh</button>
+    <hr/>
     <PublicLists lists = {lists}/>
     </div>
     </>
