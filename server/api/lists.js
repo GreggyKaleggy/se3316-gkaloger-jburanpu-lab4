@@ -47,30 +47,64 @@ router.get('/mylists', auth, async (req, res) => {
 router.post('/new', [
     check('name', 'List name between 3 and 20 characters is required').not().isEmpty().isLength({ min: 3, max: 30 }),
     check('desc', 'Description can be a maximum 1000 characters').isLength({ min: 0, max: 1000 }),
+    check('track_ids', 'Track IDs are needed').not().isEmpty().isLength({ min: 1, max: 100 }),
 ], auth, async (req, res) => {
     const user = await User.findById(req.user.id).select('-password');
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         var errorMsg = errors.array().map(error => error.msg);
-        return res.status(400).json({ errors:[{msg: errorMsg}] });
+        return res.status(400).json({ errors: [{ msg: errorMsg }] });
     }
     try {
-        const { name, desc } = req.body;
+        const { name, desc, track_ids } = req.body;
         const list = await List.findOne({ name: name });
         if (list) {
-            return res.status(400).json({ errors: [{msg: 'List name already taken'}]});
+            return res.status(400).json({ errors: [{ msg: 'List name already taken' }] });
         }
         numberOfLists = await List.countDocuments({ user: user.id });
         if (numberOfLists >= 20) {
-            return res.status(400).json({ errors: [{msg:'You have reached the maximum number of lists'}] });
+            return res.status(400).json({ errors: [{ msg: 'You have reached the maximum number of lists' }] });
         }
+        var tracksSliced = track_ids.split(' ');
+        tracksSliced = [...new Set(tracksSliced)];
+        for (let i = 0; i < tracksSliced.length; i++) {
+            var findTrack = await db.collection('tracks').findOne({ track_id: tracksSliced[i] });
+            if (!findTrack) {
+                return res.status(400).json({ error: 'Track not found' });
+            }
+            else {
+                const trackDuration = findTrack.track_duration;
+                if (trackDuration.length < 6) {
+                    var durationMin = "00:" + String(trackDuration)
+                }
+                durationMin = moment.duration(durationMin).asMinutes();
+                roundedDuration = Math.round(durationMin * 100) / 100;
+                tracksSliced[i] = {
+                    track_id: findTrack.track_id,
+                    trackduration: roundedDuration,
+                    track_title: findTrack.track_title,
+                    artist_name: findTrack.artist_name,
+                    track_genres: findTrack.track_genres
+                }
+            }
+        }
+
+
         const newList = new List({
             username: user.username,
             user: user.id,
             name: name,
+            desc: desc,
             duration: 0,
-            desc: desc
+            numberofTracks: tracksSliced.length,
+            tracklist: tracksSliced,
         });
+
+        newList.duration = 0;
+        for (let i = 0; i < newList.tracklist.length; i++) {
+            newList.duration += newList.tracklist[i].trackduration;
+        }
+
         await newList.save();
         res.json(newList);
 
@@ -85,7 +119,7 @@ router.post('/new', [
 //Add a track to a list
 router.put('/add/:name', [
     check('name', 'List ID is required').not().isEmpty(),
-    check('track_id', 'Track ID is required').not().isEmpty()
+    check('track_ids', 'Track ID is required').not().isEmpty().isLength({ min: 1, max: 100 }),
 ], auth, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -93,40 +127,52 @@ router.put('/add/:name', [
         return res.status(400).json({ error });
     }
     try {
-        const { track_id } = req.body;
+        const { track_ids } = req.body;
         const list = await List.findOne({ name: req.params.name });
+
         if (!list) {
             return res.status(400).json({ error: 'List not found' });
         }
+
         if (list.user != req.user.id) {
             return res.status(400).json({ error: 'You are not authorized to edit this list' });
         }
 
-        for (let i = 0; i < list.tracklist.length; i++) {
-            if (list.tracklist[i].track_id == req.body.track_id) {
-                return res.status(400).json({ errors: [{ msg: "Track already in list" }] });
+        var tracksSliced = track_ids.split(' ');
+        tracksSliced = [...new Set(tracksSliced)];
+
+        for (let i = 0; i < tracksSliced.length; i++) {
+            var findTrack = await db.collection('tracks').findOne({ track_id: tracksSliced[i] });
+            if (!findTrack) {
+                return res.status(400).json({ error: 'Track not found' });
+            }
+
+            else {
+                const trackDuration = findTrack.track_duration;
+                if (trackDuration.length < 6) {
+                    var durationMin = "00:" + String(trackDuration)
+                }
+                durationMin = moment.duration(durationMin).asMinutes();
+                roundedDuration = Math.round(durationMin * 100) / 100;
+                tracksSliced[i] = {
+                    track_id: findTrack.track_id,
+                    trackduration: roundedDuration,
+                    track_title: findTrack.track_title,
+                    artist_name: findTrack.artist_name,
+                    track_genres: findTrack.track_genres
+                }
             }
         }
-
-        const findTrack = await db.collection('tracks').findOne({ track_id: req.body.track_id });
-        if (!findTrack) {
-            return res.status(400).json({ error: 'Track not found' });
-        }
-        const trackduration = findTrack.track_duration;
-
-        if (trackduration.length < 6) {
-            var durationMin = "00:" + String(trackduration)
-        }
-        durationMin = moment.duration(durationMin).asMinutes();
-        roundedDuration = Math.round(durationMin * 100) / 100;
-
-        list.tracklist.push({ track_id: req.body.track_id, trackduration: roundedDuration, track_title: findTrack.track_title, artist_name: findTrack.artist_name, track_genres: findTrack.track_genres });
+        list.tracklist = list.tracklist.concat(tracksSliced);
+        const unique = [...new Map(list.tracklist.map(item => [item['track_id'], item])).values()];
+        list.tracklist = unique;
         list.numberofTracks = list.tracklist.length;
         list.duration = 0;
         for (let i = 0; i < list.tracklist.length; i++) {
             list.duration += list.tracklist[i].trackduration;
         }
         list.duration = Math.round(list.duration * 100) / 100;
+
         await list.save();
         res.json(list);
 

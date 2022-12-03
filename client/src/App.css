@@ -1,4 +1,8 @@
 /*CSS code for nav from w3schools*/
+.component {
+  margin-bottom: 60px;
+}
+
 .topnav {
   background-color: rgb(48, 48, 48);
   overflow: hidden;
@@ -38,11 +42,10 @@
 }
 
 .footer {
-  position: fixed;
-  left: 0;
-  bottom: 0;
+
   width: 100%;
   background-color: rgb(114, 114, 114);
+  height: 60px;
 }
 
 .footer ul {

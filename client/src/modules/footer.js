@@ -8,9 +8,8 @@ export default function footer() {
                 <ul>
                     <li>
                         <ActiveLink href="/SPP">Security and Privacy Policy</ActiveLink>
-                        <ActiveLink href="/DMCA">DMCA Notice</ActiveLink>
+                        <ActiveLink href="/DMCA">DMCA Notice and Takedown Policy</ActiveLink>
                         <ActiveLink href="/AUP">Acceptable Use Policy</ActiveLink>
-                        <ActiveLink href="/Takedown">Takedown Policy</ActiveLink>
                     </li>
                 </ul>
             </div>

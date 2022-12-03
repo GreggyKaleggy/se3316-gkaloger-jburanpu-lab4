@@ -1,7 +1,6 @@
 import './App.css';
 import Topnav from './modules/topnav';
 import Landing from './landing/landingPage';
-import Footer from './modules/footer';
 import Home from './home/home';
 import ArtistsPage from './artists/artistsPage';
 import CreateList from './createList/createList';
@@ -53,7 +52,7 @@ function App() {
   return (
     <><Topnav />
       <Component />
-      <Footer /></>
+    </>
   );
 }
 
