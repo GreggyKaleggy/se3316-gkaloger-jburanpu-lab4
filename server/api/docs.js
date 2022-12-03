@@ -88,4 +88,17 @@ router.delete('/deletedoc/:name', auth, async (req, res) => {
     }
 });
 
+router.get('/:name', async (req, res) => {
+    try {
+        const doc = await Docs.findOne({ title: req.params.name });
+        if (!doc) {
+            return res.status(404).json({ msg: 'Document not found' });
+        }
+        res.json(doc);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
 module.exports = { router };

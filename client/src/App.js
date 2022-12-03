@@ -1,6 +1,7 @@
 import './App.css';
 import Topnav from './modules/topnav';
 import Landing from './landing/landingPage';
+import Footer from './modules/footer';
 import Home from './home/home';
 import ArtistsPage from './artists/artistsPage';
 import CreateList from './createList/createList';
@@ -9,6 +10,7 @@ import TracksPage from './tracks/tracksPage';
 import LoginPage from './login/login';
 import Logout from './logout/logout';
 import RegisterPage from './register/register';
+import Policies from './policies/policies.js';
 
 
 function App() {
@@ -41,13 +43,17 @@ function App() {
     case "/Tracks":
       Component = TracksPage;
       break
+    case "/Policies":
+      Component = Policies;
+      break
     default:
       Component = Landing;
       break
   }
   return (
     <><Topnav />
-      <Component /></>
+      <Component />
+      <Footer /></>
   );
 }
 
