@@ -6,13 +6,25 @@ import ArtistsPage from './artists/artistsPage';
 import GenresPage from './genres/genresPage';
 import ListsPage from './lists/listsPage';
 import TracksPage from './tracks/tracksPage';
+import LoginPage from './login/login';
+import Logout from './logout/logout';
+import RegisterPage from './register/register';
 
 
 function App() {
   let Component
-  switch (window.location.pathname){
+  switch (window.location.pathname) {
     case "/":
       Component = Landing;
+      break
+    case '/login':
+      Component = LoginPage;
+      break
+    case "/logout":
+      Component = Logout;
+      break
+    case "/register":
+      Component = RegisterPage;
       break
     case "/Home":
       Component = Home;
@@ -27,15 +39,15 @@ function App() {
       Component = ListsPage;
       break
     case "/Tracks":
-      Component= TracksPage;
+      Component = TracksPage;
       break
     default:
       Component = Landing;
       break
   }
   return (
-    <><Topnav/>
-    <Component/></>
+    <><Topnav />
+      <Component /></>
   );
 }
 
