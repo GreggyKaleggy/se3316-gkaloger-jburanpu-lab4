@@ -9,7 +9,7 @@ export default function Topnav(){
                 <ActiveLink href="/">Welcome</ActiveLink>
                 <ActiveLink href="/Home">Home</ActiveLink>
                 <ActiveLink href="/Lists">My Lists</ActiveLink>
-                <ActiveLink href="/Genres">Create List</ActiveLink>
+                <ActiveLink href="/createList">Create List</ActiveLink>
                 <ActiveLink href="/Artists">Edit List</ActiveLink>
                 <ActiveLink href="/Tracks">Admin</ActiveLink>
                 </li>

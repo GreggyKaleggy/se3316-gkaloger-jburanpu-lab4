@@ -3,7 +3,7 @@ import Topnav from './modules/topnav';
 import Landing from './landing/landingPage';
 import Home from './home/home';
 import ArtistsPage from './artists/artistsPage';
-import GenresPage from './genres/genresPage';
+import CreateList from './createList/createList';
 import ListsPage from './lists/listsPage';
 import TracksPage from './tracks/tracksPage';
 import LoginPage from './login/login';
@@ -32,8 +32,8 @@ function App() {
     case "/Artists":
       Component = ArtistsPage;
       break
-    case "/Genres":
-      Component = GenresPage;
+    case "/createList":
+      Component = CreateList;
       break
     case "/Lists":
       Component = ListsPage;
