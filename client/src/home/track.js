@@ -7,11 +7,17 @@ export default function Track ({tracks}){
     const [expState, setExpState] = useState(false)
 
     async function GetTrackInfo(e){
-        setExpState(true)
-        fetch('/api/tracks/trackID/'+ String(tracks.track_id))
-          .then(response => response.json())
-          .then(data =>
-            setTrackInfo(data))
+        if (!expState){
+            setExpState(true)
+            if (trackInfo.length === 0){
+                fetch('/api/tracks/trackID/'+ String(tracks.track_id))
+                    .then(response => response.json())
+                    .then(data =>
+                setTrackInfo(data))
+                }
+        } else{
+            setExpState(false)
+        }
     }
 
     function YoutubeSearch(e){
