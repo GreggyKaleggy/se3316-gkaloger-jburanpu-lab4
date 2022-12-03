@@ -48,8 +48,8 @@ router.post('/register', [
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        error = errors.array().map(error => error.msg);
-        return res.status(400).json({ error });
+        var errorMsg = errors.array().map(error => error.msg);
+        return res.status(400).json({ errors:[{msg: errorMsg}] });
     }
     try {
         const { username, email, password } = req.body;
@@ -65,7 +65,7 @@ router.post('/register', [
             email,
             password
         });
-        let error = user.validateSync();
+        //let error = user.validateSync();
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(password, salt);
         await user.save();

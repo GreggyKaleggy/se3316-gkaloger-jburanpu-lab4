@@ -1,13 +1,21 @@
-import React, { useRef, useEffect } from "react"
+import React, { useRef, useState } from "react"
 
 export default function Register() {
+    const [serverStatus, setServerStatus] = useState([])
+    const listItems = serverStatus.map((error) => 
+                <li>{error}</li>)
+
     const usernameRef = useRef()
     const emailRef = useRef()
     const passwordRef = useRef()
+
     async function registerUser(e) {
         const username = usernameRef.current.value
-        const email = usernameRef.current.value
-        const password = usernameRef.current.value
+        const email = emailRef.current.value
+        const password = passwordRef.current.value
+        console.log(username)
+        console.log(email)
+        console.log(password)
         fetch('/api/users/register', {
             method: 'POST',
             headers: {
@@ -23,8 +31,7 @@ export default function Register() {
             response.json())
             .then(data => {
                 if (data.errors) {
-                    console.log(data.errors)
-                    console.log(data.errors[0].msg)
+                setServerStatus(data.errors[0].msg)
                 } else {
                     localStorage.setItem("x-auth-token", data.token);
                     localStorage.setItem("isLoggedIn", true);
@@ -66,6 +73,9 @@ export default function Register() {
                 <p>
                     Already have an account? <a href="/login">Log in</a>
                 </p>
+                <ul>
+                    {listItems}
+                </ul>
             </div>
         </div>
     )
