@@ -6,11 +6,11 @@ export default function Topnav(){
         <nav className="topnav">
             <ul>
                 <li>
+                <ActiveLink href="/">Welcome</ActiveLink>
                 <ActiveLink href="/Home">Home</ActiveLink>
-                <ActiveLink href="/Genres">Genres</ActiveLink>
-                <ActiveLink href="/Lists">Lists</ActiveLink>
-                <ActiveLink href="/Artists">Artists</ActiveLink>
-                <ActiveLink href="/Tracks">Tracks</ActiveLink>
+                <ActiveLink href="/Lists">My Lists</ActiveLink>
+                <ActiveLink href="/Genres">Create List</ActiveLink>
+                <ActiveLink href="/Artists">Edit List</ActiveLink>
                 </li>
             </ul>
         </nav>
