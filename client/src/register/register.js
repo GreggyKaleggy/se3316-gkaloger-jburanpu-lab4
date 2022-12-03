@@ -45,7 +45,7 @@ export default function Register() {
     return (
         <div >
             <div >
-                <h3>Sign Up</h3>
+                <h3>Register Account</h3>
                 <div>
                     <label>Username</label>
                     <input ref={usernameRef}

@@ -8,6 +8,7 @@ function Landing() {
       <hr />
       <h2>Log-in</h2>
       <h3>Unauthenticated users have limited functionality! Make sure to authenticate your account!</h3>
+      <p>Don't have an account? <a href="/register">Register</a> today!</p>
       <h2>Unauthenticated user Functionality:</h2>
       <hr />
       <h2>Home</h2>
