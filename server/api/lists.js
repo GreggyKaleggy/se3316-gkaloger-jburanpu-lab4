@@ -17,7 +17,6 @@ router.get('/', async (req, res) => {
 
         if (!req.header('x-auth-token')) {
             const firstTen = lists.slice(0, 10);
-            console.log(firstTen.length);
             res.json(firstTen);
 
         } else {
