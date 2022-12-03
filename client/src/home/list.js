@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import TrackList from './trackList';
 
 
 export default function List ({list}){
@@ -25,7 +26,7 @@ export default function List ({list}){
                 Tracks: {list.tracklist.length}
             </div>
             <div>
-                Duration: {list.duration}
+                Duration: {list.duration} Minutes
             </div>
             <div>
                 Average Rating: {list.averageRating}
@@ -40,6 +41,15 @@ export default function List ({list}){
                 <div>
                 Description: {list.desc}
                 </div>
+                <div>
+                Private List: {String(list.isPrivate)}
+                </div>
+                <hr />
+                <h4>
+                Track List: 
+                </h4>
+                <TrackList tracks = {list.tracklist}/>
+                <hr />
             </div> : null}
         </div>
         <br/>
