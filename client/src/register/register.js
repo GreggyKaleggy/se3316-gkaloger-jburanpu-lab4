@@ -13,9 +13,7 @@ export default function Register() {
         const username = usernameRef.current.value
         const email = emailRef.current.value
         const password = passwordRef.current.value
-        console.log(username)
-        console.log(email)
-        console.log(password)
+
         fetch('/api/users/register', {
             method: 'POST',
             headers: {
@@ -31,7 +29,11 @@ export default function Register() {
             response.json())
             .then(data => {
                 if (data.errors) {
-                setServerStatus(data.errors[0].msg)
+                    if (typeof data.errors[0].msg === 'string'){
+                        setServerStatus([data.errors[0].msg])
+                    }else{
+                        setServerStatus(data.errors[0].msg)
+                    }
                 } else {
                     localStorage.setItem("x-auth-token", data.token);
                     localStorage.setItem("isLoggedIn", true);
