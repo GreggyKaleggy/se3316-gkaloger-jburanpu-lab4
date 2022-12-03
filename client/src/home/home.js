@@ -1,13 +1,30 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import './home.css';
 import TrackList from './trackList';
+import PublicLists from './publicLists';
 
 function Home() {
   const [serverStatus, setServerStatus] = useState("")
   const [tracks, setTracks] = useState([])
+  const [lists, setLists] = useState([])
+  
   const trackNameRef = useRef()
   const trackArtistRef = useRef()
   const trackGenreRef = useRef()
+
+  useEffect(() => {
+    let ignore = false;
+    
+    if (!ignore)  getLists()
+    return () => { ignore = true; }
+    },[]);
+
+  async function getLists(e){
+        fetch('/api/lists/')
+          .then(response => response.json())
+          .then(data =>
+            setLists(data))
+  }
 
   async function trackSearch(e){
     const name = trackNameRef.current.value
@@ -65,6 +82,12 @@ function Home() {
     </div>
     <div>{serverStatus}</div>
     <TrackList tracks = {tracks}/>
+    <hr />
+    <div>
+    <h2>Recent Public Playlists</h2>
+    <button onClick = {getLists}>Refresh</button>
+    <PublicLists lists = {lists}/>
+    </div>
     </>
   );
 }

@@ -13,11 +13,10 @@ const userSchema = require('../schema/userSchema');
 //get all lists that are public
 router.get('/', async (req, res) => {
     try {
-        const lists = await List.find({ isPrivate: false });
+        const lists = await List.find({ isPrivate: false }).sort({modified: -1}).limit(10);
 
         if (!req.header('x-auth-token')) {
-            const firstTen = lists.slice(0, 10);
-            res.json(firstTen);
+            res.json(lists);
 
         } else {
             res.json(lists);
