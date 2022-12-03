@@ -61,15 +61,15 @@ router.post('/new', [
         return res.status(400).json({ error });
     }
     try {
-
         const { name, desc } = req.body;
         //if name is already taken, return error
-        const list = await List.findOne
-            ({ name: name });
+        const list = await List.findOne({ name: name });
         if (list) {
             return res.status(400).json({ error: 'List name already taken' });
         }
-
+        if (lists.length > 20) {
+            return res.status(400).json({ error: 'You have reached the maximum number of lists' });
+        }
         const newList = new List({
             user: req.user.id,
             name: name,
