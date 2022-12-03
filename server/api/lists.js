@@ -219,13 +219,13 @@ router.post('/review/:name', [
                 return res.status(400).json({ errors: [{ msg: "You have already reviewed this list" }] });
             }
         }
+        list.reviews.unshift(reviews);
         list.averageRating = 0
         for (let i = 0; i < list.reviews.length; i++) {
             const totalRating = list.reviews[i].rating;
             list.averageRating += totalRating;
         }
         list.averageRating = list.averageRating / list.reviews.length;
-        list.reviews.unshift(reviews);
         await list.save();
         res.json(list);
     }
