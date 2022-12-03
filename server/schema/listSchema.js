@@ -25,7 +25,7 @@ const listSchema = new Schema({
         type: Number
     },
     tracklist: [{
-        trackID: { type: Number },
+        track_id: { type: Number },
         trackduration: { type: Number },
         track_title: { type: String },
         artist_name: { type: String },

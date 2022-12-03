@@ -86,7 +86,7 @@ router.post('/new', [
 //Add a track to a list
 router.put('/add/:name', [
     check('name', 'List ID is required').not().isEmpty(),
-    check('trackID', 'Track ID is required').not().isEmpty()
+    check('track_id', 'Track ID is required').not().isEmpty()
 ], auth, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -94,7 +94,7 @@ router.put('/add/:name', [
         return res.status(400).json({ error });
     }
     try {
-        const { trackID } = req.body;
+        const { track_id } = req.body;
         const list = await List.findOne({ name: req.params.name });
         if (!list) {
             return res.status(400).json({ error: 'List not found' });
@@ -104,12 +104,12 @@ router.put('/add/:name', [
         }
 
         for (let i = 0; i < list.tracklist.length; i++) {
-            if (list.tracklist[i].trackID == req.body.trackID) {
+            if (list.tracklist[i].track_id == req.body.track_id) {
                 return res.status(400).json({ errors: [{ msg: "Track already in list" }] });
             }
         }
 
-        const findTrack = await db.collection('tracks').findOne({ track_id: req.body.trackID });
+        const findTrack = await db.collection('tracks').findOne({ track_id: req.body.track_id });
         if (!findTrack) {
             return res.status(400).json({ error: 'Track not found' });
         }
@@ -121,12 +121,13 @@ router.put('/add/:name', [
         durationMin = moment.duration(durationMin).asMinutes();
         roundedDuration = Math.round(durationMin * 100) / 100;
 
-        list.tracklist.push({ trackID: req.body.trackID, trackduration: roundedDuration, track_title: findTrack.track_title, artist_name: findTrack.artist_name, track_genres: findTrack.track_genres });
+        list.tracklist.push({ track_id: req.body.track_id, trackduration: roundedDuration, track_title: findTrack.track_title, artist_name: findTrack.artist_name, track_genres: findTrack.track_genres });
         list.numberofTracks = list.tracklist.length;
         list.duration = 0;
         for (let i = 0; i < list.tracklist.length; i++) {
             list.duration += list.tracklist[i].trackduration;
         }
+        list.duration = Math.round(list.duration * 100) / 100;
         await list.save();
         res.json(list);
 
@@ -198,10 +199,6 @@ router.post('/review/:name', [
     check('rating', 'Rating from 1 to 5 is required').not().isEmpty().isInt({ min: 1, max: 5 }),
     check('review', 'Review is optional upto 200 characters').not().isEmpty().isLength({ min: 0, max: 200 })
 ], auth, async (req, res) => {
-    const user = await User.findById(req.user.id).select('-password');
-    if (!user.verified) {
-        return res.status(400).json({ msg: 'Unverified users cannot leave reviews' });
-    }
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         error = errors.array().map(error => error.msg);
@@ -247,7 +244,12 @@ router.put('/changeprivacy/:name/:value', auth, async (req, res) => {
         }
         list.isPrivate = value;
         await list.save();
-        res.json(list);
+        if (value == "true") {
+            res.json("list is now private");
+        }
+        else {
+            res.json("list is now public");
+        }
 
     }
     catch (err) {
