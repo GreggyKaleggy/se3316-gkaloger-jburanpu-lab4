@@ -1,9 +1,21 @@
-import React from 'react'
+import React, { useState } from 'react';
+import TrackInfo from './trackInfo'
+const ytSearch = "https://www.youtube.com/results?search_query="
 
 export default function Track ({tracks}){
+    const [trackInfo, setTrackInfo] = useState([])
+    const [expState, setExpState] = useState(false)
 
-    function YoutubeSearch(){
-        var ytPath = "https://www.youtube.com/results?search_query="+ String(tracks.track_title) + String(tracks.artist_name)
+    async function GetTrackInfo(e){
+        setExpState(true)
+        fetch('/api/tracks/trackID/'+ String(tracks.track_id))
+          .then(response => response.json())
+          .then(data =>
+            setTrackInfo(data))
+    }
+
+    function YoutubeSearch(e){
+        var ytPath = ytSearch + String(tracks.track_title) + String(tracks.artist_name)
         window.open(ytPath,"_Blank")
     }
 
@@ -37,8 +49,9 @@ export default function Track ({tracks}){
             <div>
                 Track ID: {tracks.track_id}
             </div>
-            
+            <button onClick={GetTrackInfo}>Show Track Info</button>
         </div>
+        {expState ? <TrackInfo trackInfo = {trackInfo}/> : null}
     <br/>
     </>)
 }

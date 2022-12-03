@@ -29,16 +29,11 @@ router.get('/trackID/:id', async (req, res) => {
             return res.status(404).json({ errors: [{ msg: 'Enter a valid ID' }] })
         }
 
-        const result = await db.collection('tracks').findOne({ track_id: req.params.id });
+        const result = await db.collection('tracks').findOne({ track_id: req.params.id }, { projection: { _id: 0, album_id: 1, album_title: 1, artist_id: 1, artist_name: 1, tags: 1, track_date_created: 1, track_date_recorded: 1, track_duration: 1, track_genres: 1, track_number: 1, track_title: 1} });
         if (!result) {
             return res.status(404).json({ errors: [{ msg: 'Track not found' }] });
         }
-        const { album_id, album_title, artist_id, artist_name, tags, track_date_created, track_date_recorded, track_duration, track_genres, track_number, track_title } = result
-        newObj = { album_id, album_title, artist_id, artist_name, tags, track_date_created, track_date_recorded, track_duration, track_genres, track_number, track_title }
-        if (!newObj) {
-            return res.status(404).json({ errors: [{ msg: 'No Tracks Found' }] });
-        }
-        res.json(newObj);
+        res.json(result);
     }
     catch (err) {
         console.error(err.message);
@@ -84,7 +79,6 @@ router.post('/trackSearch', async (req, res) => {
             searchName = searchName.replace(/\s+/g, '').toUpperCase();
             var nameResult = cloneDeep(allTracks.filter(t => stringSim.compareTwoStrings(searchName, String(t.track_title).replace(/\s+/g, '').toUpperCase()) >= 0.70))
         }
-
 
         if (searchArtist !== "") {
             searchArtist = searchArtist.replace(/\s+/g, '').toUpperCase();
