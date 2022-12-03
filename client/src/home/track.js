@@ -1,6 +1,12 @@
 import React from 'react'
 
 export default function Track ({tracks}){
+
+    function YoutubeSearch(){
+        var ytPath = "https://www.youtube.com/results?search_query="+ String(tracks.track_title) + String(tracks.artist_name)
+        window.open(ytPath,"_Blank")
+    }
+
     var genres = []
     if (tracks.track_genres !== ""){
         var genreData = JSON.parse(String(tracks.track_genres).replace(/'/g, '"'))
@@ -20,6 +26,7 @@ export default function Track ({tracks}){
     <div className="TrackBox">
             <div>
                 Track Name: {tracks.track_title}
+                <button onClick={YoutubeSearch}>Play</button>
             </div>
             <div>
                 Artist / Band Name: {tracks.artist_name}
