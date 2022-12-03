@@ -23,9 +23,6 @@ router.post('/login', async (req, res) => {
         if (user.deactivated) {
             return res.status(400).json({ msg: 'The account is deactivated, please contact an admin' });
         }
-        if (!user.verified) {
-            return res.status(400).json({ msg: 'Please verify your email address for full functionality' });
-        }
         const payload = {
             user: {
                 id: user.id

@@ -8,12 +8,13 @@ const { check, validationResult } = require('express-validator');
 const abbrev = require('abbrev');
 const auth = require("../middleware/auth");
 const userSchema = require('../schema/userSchema');
+const { find } = require('lodash');
 
 
 //get all lists that are public
 router.get('/', async (req, res) => {
     try {
-        const lists = await List.find({ isPrivate: false }).sort({modified: -1}).limit(10);
+        const lists = await List.find({ isPrivate: false }).sort({ modified: -1 }).limit(10);
 
         if (!req.header('x-auth-token')) {
             res.json(lists);
@@ -27,8 +28,6 @@ router.get('/', async (req, res) => {
         res.status(500).send('Server Error');
     }
 });
-
-
 
 //Get all user lists
 router.get('/mylists', auth, async (req, res) => {
@@ -51,9 +50,6 @@ router.post('/new', [
     check('desc', 'Description can be a maximum 1000 characters').isLength({ min: 0, max: 1000 }),
 ], auth, async (req, res) => {
     const user = await User.findById(req.user.id).select('-password');
-    if (!user.verified) {
-        return res.status(400).json({ msg: 'Please verify your email address to create a list' });
-    }
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         error = errors.array().map(error => error.msg);
@@ -61,7 +57,6 @@ router.post('/new', [
     }
     try {
         const { name, desc } = req.body;
-        //if name is already taken, return error
         const list = await List.findOne({ name: name });
         if (list) {
             return res.status(400).json({ error: 'List name already taken' });
@@ -71,13 +66,12 @@ router.post('/new', [
             return res.status(400).json({ error: 'You have reached the maximum number of lists' });
         }
         const newList = new List({
-            user: req.user.id,
+            username: user.username,
+            user: user.id,
             name: name,
             duration: 0,
             desc: desc
-
         });
-
         await newList.save();
         res.json(newList);
 
@@ -90,7 +84,7 @@ router.post('/new', [
 
 
 //Add a track to a list
-router.put('/add', [
+router.put('/add/:name', [
     check('name', 'List ID is required').not().isEmpty(),
     check('trackID', 'Track ID is required').not().isEmpty()
 ], auth, async (req, res) => {
@@ -99,23 +93,27 @@ router.put('/add', [
         error = errors.array().map(error => error.msg);
         return res.status(400).json({ error });
     }
-
     try {
-        const list = await List.find({ user: req.user.id });
+        const { trackID } = req.body;
+        const list = await List.findOne({ name: req.params.name });
         if (!list) {
-            return res.status(400).json({ errors: [{ msg: "List doesn't exist" }] });
+            return res.status(400).json({ error: 'List not found' });
         }
-        const trackCheck = await db.collection('tracks').findOne({ track_id: req.body.trackID });
-        if (!trackCheck) {
-            return res.status(400).json({ errors: [{ msg: "Track doesn't exist" }] });
+        if (list.user != req.user.id) {
+            return res.status(400).json({ error: 'You are not authorized to edit this list' });
         }
+
         for (let i = 0; i < list.tracklist.length; i++) {
             if (list.tracklist[i].trackID == req.body.trackID) {
                 return res.status(400).json({ errors: [{ msg: "Track already in list" }] });
             }
         }
-        const findTrack = await db.collection('tracks').find({ track_id: req.body.trackID }).toArray();
-        const trackduration = findTrack[0].track_duration;
+
+        const findTrack = await db.collection('tracks').findOne({ track_id: req.body.trackID });
+        if (!findTrack) {
+            return res.status(400).json({ error: 'Track not found' });
+        }
+        const trackduration = findTrack.track_duration;
 
         if (trackduration.length < 6) {
             var durationMin = "00:" + String(trackduration)
@@ -123,14 +121,12 @@ router.put('/add', [
         durationMin = moment.duration(durationMin).asMinutes();
         roundedDuration = Math.round(durationMin * 100) / 100;
 
-        list.tracklist.push({ trackID: req.body.trackID, trackduration: roundedDuration });
+        list.tracklist.push({ trackID: req.body.trackID, trackduration: roundedDuration, track_title: findTrack.track_title, artist_name: findTrack.artist_name, track_genres: findTrack.track_genres });
         list.numberofTracks = list.tracklist.length;
-
         list.duration = 0;
         for (let i = 0; i < list.tracklist.length; i++) {
             list.duration += list.tracklist[i].trackduration;
         }
-
         await list.save();
         res.json(list);
 

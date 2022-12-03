@@ -10,6 +10,10 @@ const listSchema = new Schema({
     duration: {
         type: Number
     },
+    username: {
+        type: String,
+        ref: 'user'
+    },
     user: {
         type: Schema.Types.ObjectId,
         ref: 'user'
@@ -22,7 +26,10 @@ const listSchema = new Schema({
     },
     tracklist: [{
         trackID: { type: Number },
-        trackduration: { type: Number }
+        trackduration: { type: Number },
+        track_title: { type: String },
+        artist_name: { type: String },
+        track_genres: { type: String }
     }],
     averageRating: {
         type: Number
