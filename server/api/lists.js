@@ -206,29 +206,37 @@ router.delete('/delete/:name', auth, async (req, res) => {
 
 
 //Delete a track from a list
-router.delete('/delete/:name/:trackID', auth, async (req, res) => {
+router.delete('/deletetrack/:name', auth, async (req, res) => {
     try {
-        const userLists = await List.find({ user: req.user.id });
         const list = await List.findOne({ name: req.params.name });
+        const { track_ids } = req.body;
         if (!list) {
             return res.status(400).json({ errors: [{ msg: "List doesn't exist" }] });
         }
-        oldLength = list.tracklist.length;
-        for (let i = 0; i < list.tracklist.length; i++) {
-            if (list.tracklist[i].trackID == req.params.trackID) {
-                list.tracklist.splice(i, 1);
+        if (list.user != req.user.id) {
+            return res.status(400).json({ error: 'You are not authorized to edit this list' });
+        }
+        if (list.tracklist.length == 0) {
+            return res.status(400).json({ error: 'List is empty' });
+        }
+        oldSize = list.tracklist.length;
+        var tracksSliced = track_ids.split(' ');
+        tracksSliced = [...new Set(tracksSliced)];
+        for (let i = 0; i < tracksSliced.length; i++) {
+            for (let j = 0; j < list.tracklist.length; j++) {
+                if (list.tracklist[j].track_id == tracksSliced[i]) {
+                    list.tracklist.splice(j, 1);
+                }
             }
         }
-        if (oldLength == list.tracklist.length) {
-            return res.status(400).json({ errors: [{ msg: "Track is not in the list" }] });
+        newSize = list.tracklist.length;
+        if (oldSize == newSize) {
+            return res.status(400).json({ error: 'Track not found in list' });
         }
-        list.numberofTracks = list.tracklist.length;
-
         list.duration = 0;
         for (let i = 0; i < list.tracklist.length; i++) {
             list.duration += list.tracklist[i].trackduration;
         }
-
         await list.save();
         res.json(list);
     }
