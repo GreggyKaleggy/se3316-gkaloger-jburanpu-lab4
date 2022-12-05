@@ -10,12 +10,8 @@ router.use(express.json())
 // @route   GET api/docs
 // @desc    Get all docs
 // @access  Public
-router.get('/', auth, async (req, res) => {
+router.get('/', async (req, res) => {
     try {
-        const currentUser = await userSchema.findById(req.user.id);
-        if (!currentUser.isAdmin) {
-            return res.status(401).json({ msg: 'You are not authorized to perform this action' });
-        }
         const docs = await Docs.find();
         res.json(docs);
     } catch (err) {
