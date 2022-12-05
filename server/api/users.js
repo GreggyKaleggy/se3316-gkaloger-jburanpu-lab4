@@ -9,27 +9,27 @@ const auth = require("../middleware/auth");
 const config = require('../config');
 
 
-router.post('/login',[
+router.post('/login', [
     check('email', 'Please include valid email').isEmail().normalizeEmail(),
     check('password', 'Please enter valid password').isLength({ min: 6, max: 30 }).trim().escape()
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         var errorMsg = errors.array().map(error => error.msg);
-        return res.status(400).json({ errors:[{msg: errorMsg}] });
+        return res.status(400).json({ errors: [{ msg: errorMsg }] });
     }
     const { email, password } = req.body;
     try {
         let user = await userSchema.findOne({ email });
         if (!user) {
-            return res.status(400).json({ errors: [{msg: 'Invalid Credentials'}] });
+            return res.status(400).json({ errors: [{ msg: 'Invalid Credentials' }] });
         }
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(400).json({ errors: [{msg: 'Invalid Credentials'}] });
+            return res.status(400).json({ errors: [{ msg: 'Invalid Credentials' }] });
         }
         if (user.deactivated) {
-            return res.status(400).json({ errors: [{msg: 'The account is deactivated, please contact an admin'}]});
+            return res.status(400).json({ errors: [{ msg: 'The account is deactivated, please contact an admin' }] });
         }
         const payload = {
             user: {
@@ -57,7 +57,7 @@ router.post('/register', [
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         var errorMsg = errors.array().map(error => error.msg);
-        return res.status(400).json({ errors:[{msg: errorMsg}] });
+        return res.status(400).json({ errors: [{ msg: errorMsg }] });
     }
     try {
         const { username, email, password } = req.body;
@@ -109,12 +109,6 @@ router.put('/changepassword', [
             return res.status(400).json({ errors: [{ msg: 'Email address is not associated with any account' }] });
         }
         const user = await User.findById(req.user.id).select('-password');
-        if (!user.verified) {
-            return res.status(400).json({
-                msg: 'Only verified users can change their password, please verify your email by clicking here:' +
-                    'http://localhost:3001/verify/'
-            });
-        }
         const isMatch = await bcrypt.compare(oldPassword, emailCheck.password);
         if (!isMatch) {
             return res.status(400).json({ errors: [{ msg: 'The old password you entered is incorrect' }] });
