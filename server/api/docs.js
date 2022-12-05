@@ -4,6 +4,7 @@ const router = express.Router();
 const auth = require('../middleware/auth');
 const { check, validationResult } = require('express-validator');
 const userSchema = require('../schema/userSchema');
+const instructions = require('../schema/instructionsSchema');
 router.use(express.json())
 
 
@@ -84,13 +85,27 @@ router.delete('/deletedoc/:name', auth, async (req, res) => {
     }
 });
 
-router.get('/:name', async (req, res) => {
+router.get('/find/:name', async (req, res) => {
     try {
         const doc = await Docs.findOne({ title: req.params.name });
         if (!doc) {
             return res.status(404).json({ msg: 'Document not found' });
         }
         res.json(doc);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+router.get('/instructions', auth, async (req, res) => {
+    try {
+        const user = await userSchema.findById(req.user.id);
+        if (!user.isAdmin) {
+            return res.status(401).json({ msg: 'You are not authorized to perform this action' });
+        }
+        const instruction = await instructions.find({ title: 'DMCA and Takedown Policy How to' });
+        res.json(instruction);
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
