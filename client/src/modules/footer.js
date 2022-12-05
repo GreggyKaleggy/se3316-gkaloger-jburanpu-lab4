@@ -1,24 +1,15 @@
-import react, { useState } from "react";
-import axios from "axios";
+import React, { useState } from "react";
+
 
 export default function Footer() {
-    const getDoc = (e) => {
-        e.preventDefault();
-        axios.get('/api/docs/find/' + e.target.id)
-            .then(res => {
-                console.log(res)
-            })
-            .catch(error => {
-                console.log(error)
-            })
-
-    }
 
     return (
         <nav className="footer">
             <div className="footer">
-                <ActiveLink onClick={getDoc} id="AUP" href="/docs">AUP</ActiveLink>
-                <ActiveLink onClick={getDoc} id="DMCA" href="/DMCA">DMCA and Takedown Policy</ActiveLink>
+                <ActiveLink href="/Docs">AUP</ActiveLink>
+                <ActiveLink href="/Docs">DMCA and Takedown Policy</ActiveLink>
+                <ActiveLink href="/Docs">Privacy Policy</ActiveLink>
+                <ActiveLink href="/Docs">DMCA Instructions for Admins</ActiveLink>
             </div>
         </nav>
     )

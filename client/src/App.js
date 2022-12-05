@@ -9,7 +9,7 @@ import TracksPage from './tracks/tracksPage';
 import LoginPage from './login/login';
 import Logout from './logout/logout';
 import RegisterPage from './register/register';
-import Policies from './policies/policies.js';
+import Docs from './footerLinks/docs';
 
 
 function App() {
@@ -42,8 +42,8 @@ function App() {
     case "/Tracks":
       Component = TracksPage;
       break
-    case "/Policies":
-      Component = Policies;
+    case "/Docs":
+      Component = Docs;
       break
     default:
       Component = Landing;
