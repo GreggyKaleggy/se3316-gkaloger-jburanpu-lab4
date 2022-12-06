@@ -294,13 +294,15 @@ router.put('/changePrivacy', auth, async (req, res) => {
 })
 
 //Delete a list
-router.delete('/delete/:name', auth, async (req, res) => {
-    const user = await User.findById(req.user.id).select('-password');
+router.delete('/deleteList', auth, async (req, res) => {
     try {
-        const userLists = await List.find({ user: req.user.id });
-        const list = await List.findOne({ name: req.params.name });
+        const { name } = req.body;
+        const list = await List.findOne({ name: name });
         if (!list) {
             return res.status(400).json({ errors: [{ msg: "List doesn't exist" }] });
+        }
+        if (list.user != req.user.id) {
+            return res.status(400).json({ errors: [{msg: 'You are not authorized to edit this list'}] });
         }
         await list.remove();
         res.json("list deleted");
@@ -346,32 +348,6 @@ router.post('/review/:name', [
         list.averageRating = list.averageRating / list.reviews.length;
         await list.save();
         res.json(list);
-    }
-    catch (err) {
-        console.error(err.message);
-        res.status(500).send('Internal Server Error');
-    }
-})
-
-router.put('/changeprivacy/:name/:value', auth, async (req, res) => {
-    try {
-        const value = req.params.value;
-        const list = await List.findOne({ name: req.params.name });
-        if (!list) {
-            return res.status(400).json({ errors: [{ msg: "List doesn't exist" }] });
-        }
-        if (list.user != req.user.id) {
-            return res.status(400).json({ error: 'You are not authorized to edit this list' });
-        }
-        list.isPrivate = value;
-        await list.save();
-        if (value == "true") {
-            res.json("list is now private");
-        }
-        else {
-            res.json("list is now public");
-        }
-
     }
     catch (err) {
         console.error(err.message);

@@ -3,6 +3,7 @@ import ErrorDisplay from './errorDisplay';
 
 export default function ListEditor ({list}){
     const [editState, setEditState] = useState(false)
+    const [delState, setDelState] = useState(false)
     const [serverStatus, setServerStatus] = useState([])
     
                 
@@ -25,6 +26,13 @@ export default function ListEditor ({list}){
         }
     }
 
+    async function ToggleDelete(e){
+        if (!delState){
+            setDelState(true)
+        } else{
+            setDelState(false)
+        }
+    }
     async function EditList(e) {
         const name = listNameRef.current.value
         const desc = listDescriptionRef.current.value
@@ -136,6 +144,29 @@ export default function ListEditor ({list}){
             )
       }
 
+      async function DeleteList (e){
+        fetch('/api/lists/deleteList', {
+            method: 'DELETE',
+            headers: {
+              'Accept': '/',
+              'Content-Type': 'application/json',
+              'x-auth-token': localStorage.getItem('x-auth-token')
+            },
+            body: JSON.stringify({
+              name : listName
+            })
+          }).then(response =>
+            response.json())
+            .then(data => {
+              if (data.errors) {
+                setServerStatus(`Error: ${data.errors[0].msg}`)
+              } else {
+                setServerStatus(`List ${listName} Deleted!`)
+              }
+            }
+            )
+      }
+
     return(
         <>
         <div className="EditBox">
@@ -179,6 +210,20 @@ export default function ListEditor ({list}){
             <input ref={listPrivRef} id = "changePriv" type="checkbox" defaultChecked = {list.isPrivate}/>
             <input type="button" onClick = {ChangePriv} defaultValue="Save"/>
             <br/>
+            <br/>
+            <b>Delete List</b>
+            <br/>
+            {!delState ? <input type="button" onClick = {ToggleDelete} defaultValue="Delete"/> : null}
+            {delState ? 
+            <>
+            <div> Are you sure you want to delete this list? </div> 
+            <b>THIS CANNOT BE UNDONE</b>
+            <br/>
+            <input type="button" onClick = {ToggleDelete} defaultValue="No"/>
+            <input type="button" onClick = {DeleteList} defaultValue="Yes"/>
+            </>
+            : null}
+
             <ErrorDisplay errors = {serverStatus}/>
             </> 
             : null}
