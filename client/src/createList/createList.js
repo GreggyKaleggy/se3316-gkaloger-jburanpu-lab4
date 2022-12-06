@@ -1,10 +1,11 @@
 import React, {useState, useRef} from "react";
 import IDSearch from "../modules/idSearch";
+import ErrorDisplay from "../modules/errorDisplay";
 
 
 export default function CreateList (){
     const login = localStorage.getItem("isLoggedIn");
-    const [serverStatus, setServerStatus] = useState("")
+    const [serverStatus, setServerStatus] = useState([])
     
 
     const listNameRef = useRef()
@@ -57,7 +58,7 @@ export default function CreateList (){
         <input ref={tracksListRef} type="text" placeholder="Tracks"/>
         <br/>
         <input onClick={CreateList} type="button" defaultValue="Submit"/>
-        <div>{serverStatus}</div>
+        <ErrorDisplay errors={serverStatus}/>
         <IDSearch/>
         </>
         : null}

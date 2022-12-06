@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ListProcessor from '../modules/listProcessor';
+import IDSearch from '../modules/idSearch';
 
 
 export default function EditList (){
@@ -33,6 +34,7 @@ export default function EditList (){
         </>
         : null}
         {login ?  <>
+        <IDSearch/>
         <div>
         <h2>Your Lists</h2>
         <button onClick={getLists}>Refresh</button>

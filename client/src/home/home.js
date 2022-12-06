@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import TrackList from '../modules/trackList';
 import ViewLists from '../modules/viewLists';
+import ErrorDisplay from '../modules/errorDisplay';
 
 function Home() {
-  const [serverStatus, setServerStatus] = useState("")
+  const [serverStatus, setServerStatus] = useState([])
   const [tracks, setTracks] = useState([])
   const [lists, setLists] = useState([])
 
@@ -49,7 +50,7 @@ function Home() {
         if (data.errors) {
           setServerStatus(`Error: ${data.errors[0].msg}`)
         } else {
-          setServerStatus("")
+          setServerStatus([])
           setTracks(data)
         }
       }
@@ -69,7 +70,7 @@ function Home() {
         <input ref={trackGenreRef} type="text" name="trackGenre" placeholder="Track Genre" />
         <input type="button" defaultValue="Search" onClick={trackSearch} />
       </div>
-      <div>{serverStatus}</div>
+      <ErrorDisplay errors = {serverStatus}/>
       <TrackList tracks={tracks} />
       <hr />
       <div>

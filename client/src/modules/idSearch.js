@@ -1,11 +1,12 @@
 import React, {useState, useRef} from "react";
 import TrackList from '../modules/trackList';
+import ErrorDisplay from "./errorDisplay";
 
 
 export default function IDSearch (){
     const trackIDRef = useRef()
     const [tracks, setTracks] = useState([])
-    const [serverStatus, setServerStatus] = useState("")
+    const [serverStatus, setServerStatus] = useState([])
 
     async function trackIDSearch(e) {
       setServerStatus("Loading...")
@@ -16,7 +17,7 @@ export default function IDSearch (){
             setTracks([])
             setServerStatus(`Error: ${data.errors[0].msg}`)
           } else {
-            setServerStatus("")
+            setServerStatus([])
             setTracks([data])
           }})
     }
@@ -25,7 +26,7 @@ export default function IDSearch (){
         <h2>Search for a track by ID!</h2>
         <input ref={trackIDRef} type="text" name="trackID" placeholder="Track ID" />
         <input type="button" defaultValue="Search" onClick={trackIDSearch} />
-        <div>{serverStatus}</div>
+        <ErrorDisplay errors = {serverStatus}/>
         <TrackList tracks={tracks} />
         </>
     )
