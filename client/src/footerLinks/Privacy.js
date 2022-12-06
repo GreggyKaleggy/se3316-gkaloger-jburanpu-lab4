@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import ErrorDisplay from '../modules/errorDisplay';
 
 
+//function to get privacy document 
 export default function Docs() {
     const admin = localStorage.getItem("isAdmin");
     const [results, setResults] = React.useState({});
@@ -16,6 +17,7 @@ export default function Docs() {
     title = results.title
     content = results.content
 
+    //get privacy document
     useEffect(() => {
         fetch("/api/docs/find/638e6f91e86ca3056346be0a")
             .then(res => res.json())
@@ -26,6 +28,7 @@ export default function Docs() {
             )
     }, [])
 
+    //put request to edit document
     function editDoc() {
         const newName = titleRef.current.value
         const newContent = contentRef.current.value

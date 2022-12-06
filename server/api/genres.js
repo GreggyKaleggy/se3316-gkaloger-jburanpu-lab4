@@ -7,7 +7,9 @@ const mongoose = require('mongoose');
 const db = mongoose.connection;
 
 
-//get all genres
+//@route    GET api/genres
+//@desc     GET request to get all genres - from lab 3 and not used
+//@access   Public
 router.get('/', async (req, res) => {
     try {
         const result = await db.collection('genres').find().toArray();

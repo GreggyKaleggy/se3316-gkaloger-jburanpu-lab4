@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import ErrorDisplay from '../modules/errorDisplay';
 
 
-
+//function to show AUP with formatting 
 export default function Docs() {
     const admin = localStorage.getItem("isAdmin");
     const [results, setResults] = React.useState({});
@@ -18,6 +18,7 @@ export default function Docs() {
     title = results.title
     content = results.content
 
+    //get AUP doc from database
     useEffect(() => {
         fetch("/api/docs/find/638bc20395dd56c0a23677cd")
             .then(res => res.json())
@@ -28,6 +29,7 @@ export default function Docs() {
             )
     }, [])
 
+    //edit AUP doc
     function editDoc() {
         const newName = titleRef.current.value
         const newContent = contentRef.current.value

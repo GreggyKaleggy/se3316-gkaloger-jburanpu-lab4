@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
 
 
-
+//function to show instructions with formatting
 export default function Docs() {
     const [results, setResults] = React.useState({});
 
+    //get request to show instructions for DMCA notices
     useEffect(() => {
         fetch('/api/docs/instructions', {
             method: 'GET',

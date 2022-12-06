@@ -8,7 +8,9 @@ const config = require('../config');
 const List = require('../schema/listSchema');
 
 
-//admin ability to make others admin
+//@route    PUT api/admins/chageStatus
+//@desc     PUT request to make an user an admin
+//@access   Private + for admins only
 router.put('/changestatus', [
     check('email', 'Please include valid email').isEmail().normalizeEmail()
 ], auth, async (req, res) => {
@@ -21,7 +23,7 @@ router.put('/changestatus', [
 
         const currentUser = await userSchema.findById(req.user.id);
         if (!currentUser.isAdmin) {
-                return res.status(401).json({ errors: [{msg: 'You are not authorized to perform this action'}] });
+            return res.status(401).json({ errors: [{ msg: 'You are not authorized to perform this action' }] });
         }
         const { email, isAdmin } = req.body;
         let emailCheck = await User.findOne({ email: email });
@@ -37,7 +39,10 @@ router.put('/changestatus', [
     }
 });
 
-//admin deactivating users
+
+//@route    PUT api/admins/deactivate
+//@desc     PUT request to deactivate an user
+//@access   Private + for admins only
 router.put('/deactivate', [
     check('email', 'Please include valid email').isEmail().normalizeEmail()
 ], auth, async (req, res) => {
@@ -49,7 +54,7 @@ router.put('/deactivate', [
     try {
         const currentUser = await userSchema.findById(req.user.id);
         if (!currentUser.isAdmin) {
-            return res.status(401).json({ errors: [{msg: 'You are not authorized to perform this action'}] });
+            return res.status(401).json({ errors: [{ msg: 'You are not authorized to perform this action' }] });
         }
         const { email, deactivated } = req.body;
         let emailCheck = await User.findOne({ email: email });
@@ -66,12 +71,15 @@ router.put('/deactivate', [
     }
 });
 
-//admin ability to hide reviews
+
+//@route    PUT api/admins/reviewvisability
+//@desc     PUT request to change visability of a review
+//@access   Private + for admins only
 router.put('/reviewvisability', auth, async (req, res) => {
     try {
         const currentUser = await userSchema.findById(req.user.id);
         if (!currentUser.isAdmin) {
-            return res.status(401).json({ errors: [{msg: 'You are not authorized to perform this action'}] });
+            return res.status(401).json({ errors: [{ msg: 'You are not authorized to perform this action' }] });
         }
         const { list, username, hidden } = req.body;
         const updatedReview = await List.findOneAndUpdate({ name: list }, { $set: { 'reviews.$[elem].hidden': hidden } }, { arrayFilters: [{ 'elem.username': username }], new: true });
@@ -84,13 +92,16 @@ router.put('/reviewvisability', auth, async (req, res) => {
     }
 });
 
+//@route    GET api/admins/admincheck
+//@desc     GET request to check if user, this is for front end when a user is logging in
+//@access   Private route
 router.get('/admincheck', auth, async (req, res) => {
     try {
         const currentUser = await userSchema.findById(req.user.id);
         if (!currentUser.isAdmin) {
-            res.json({isAdmin: false});
+            res.json({ isAdmin: false });
         } else {
-            res.json({isAdmin: true});
+            res.json({ isAdmin: true });
         }
     }
     catch (err) {

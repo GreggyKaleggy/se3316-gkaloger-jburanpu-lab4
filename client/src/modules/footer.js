@@ -2,8 +2,10 @@ import React from "react";
 
 
 export default function Footer() {
+    //get admin status
     const admin = localStorage.getItem("isAdmin");
 
+    //all footer links
     return (
         <nav className="footer">
             <div className="footer">
@@ -15,6 +17,7 @@ export default function Footer() {
         </nav>
     )
 
+    //active link function to pass through atrributes
     function ActiveLink({ href, id, children, ...props }) {
         const path = window.location.pathname
         return (

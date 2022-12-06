@@ -21,6 +21,10 @@ router.get('/', async (req, res) => {
     }
 });
 
+
+// @route   POST api/docs/newdoc
+// @desc    POST request to create a new doc -- not used
+// @access  Private - for admins only
 router.post('/newdoc',
     check('title', 'Title is required').not().isEmpty(),
     check('content', 'Content is required, up to 1000 characters').not().isEmpty().isLength({ min: 1, max: 1000 }),
@@ -47,6 +51,10 @@ router.post('/newdoc',
         }
     });
 
+
+// @route   PUT api/docs/editdoc/:id
+// @desc    PUT request to edit a doc by a given id
+// @access  Private - for admins only
 router.put('/editdoc/:id', [
     check('title', 'Title is required').not().isEmpty(),
     check('content', 'Content is required, up to 1000 characters').not().isEmpty().isLength({ min: 1, max: 1000 })
@@ -73,6 +81,9 @@ router.put('/editdoc/:id', [
     }
 });
 
+// @route   DELETE api/docs/deletedoc/:name
+// @desc    DELETE a doc by a given name
+// @access  Private - for admins only
 router.delete('/deletedoc/:name', auth, async (req, res) => {
     try {
         const currentUser = await userSchema.findById(req.user.id);
@@ -90,6 +101,9 @@ router.delete('/deletedoc/:name', auth, async (req, res) => {
     }
 });
 
+// @route   GET api/docs/find/:id
+// @desc    Find a doc by a given id
+// @access  Public
 router.get('/find/:id', async (req, res) => {
     try {
         const doc = await Docs.findOne({ _id: req.params.id });
@@ -103,6 +117,9 @@ router.get('/find/:id', async (req, res) => {
     }
 });
 
+// @route   GET api/docs/instructions 
+// @desc    Get instructions for DMCA and Takedown Policy for admins. This is a static document.
+// @access  Private - for admins only
 router.get('/instructions', auth, async (req, res) => {
     try {
         const user = await userSchema.findById(req.user.id);

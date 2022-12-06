@@ -6,7 +6,9 @@ const db = mongoose.connection;
 const stringSim = require('string-similarity');
 var cloneDeep = require('lodash.clonedeep');
 
-//route for /api/tracks
+//@route    GET api/tracks
+//@desc     GET request to get all tracks - from lab 3 and not used
+//@access   Public
 router.get('/', async (req, res) => {
     try {
         const result = await db.collection('tracks').find().toArray();
@@ -19,17 +21,19 @@ router.get('/', async (req, res) => {
 });
 
 
-//Getting the details needed given the track id
+//@route    GET api/tracks/trackID/:id
+//@desc     GET request to get a track by track ID
+//@access   Public
 router.get('/trackID/:id', async (req, res) => {
     try {
         if (isNaN(req.params.id)) {
-            return res.status(404).json({ errors: [{msg:'Track ID must be an integer'}]});
+            return res.status(404).json({ errors: [{ msg: 'Track ID must be an integer' }] });
         }
         if (req.params.id > 10000000) {
             return res.status(404).json({ errors: [{ msg: 'Enter a valid ID' }] })
         }
 
-        const result = await db.collection('tracks').findOne({ track_id: req.params.id }, { projection: { _id: 0, track_id:1, album_id: 1, album_title: 1, artist_id: 1, artist_name: 1, tags: 1, track_date_created: 1, track_date_recorded: 1, track_duration: 1, track_genres: 1, track_number: 1, track_title: 1} });
+        const result = await db.collection('tracks').findOne({ track_id: req.params.id }, { projection: { _id: 0, track_id: 1, album_id: 1, album_title: 1, artist_id: 1, artist_name: 1, tags: 1, track_date_created: 1, track_date_recorded: 1, track_duration: 1, track_genres: 1, track_number: 1, track_title: 1 } });
         if (!result) {
             return res.status(404).json({ errors: [{ msg: 'Track not found' }] });
         }
@@ -68,23 +72,32 @@ router.get('/search/:title', async (req, res) => {
     }
 });
 
+
+//@route    POST api/tracks/trackSearch
+//@desc     POST request to get a track by track title + artist name + genre, or any combination of the three
+//@access   Public
 router.post('/trackSearch', async (req, res) => {
-    var {searchName, searchArtist, searchGenre} = req.body
-    if (searchName == "" && searchArtist == "" && searchGenre == ""){
+    // Get the search parameters from the request body
+    var { searchName, searchArtist, searchGenre } = req.body
+    if (searchName == "" && searchArtist == "" && searchGenre == "") {
         return res.status(404).json({ errors: [{ msg: 'No input provided' }] });
     }
     try {
+        //get all tracks
         const allTracks = await db.collection('tracks').find({}, { projection: { _id: 0, track_id: 1, track_title: 1, track_genres: 1, artist_name: 1 } }).toArray();
+        //check is name is empty
         if (searchName !== "") {
             searchName = searchName.replace(/\s+/g, '').toUpperCase();
             var nameResult = cloneDeep(allTracks.filter(t => stringSim.compareTwoStrings(searchName, String(t.track_title).replace(/\s+/g, '').toUpperCase()) >= 0.70))
         }
 
+        //check if artist is empty
         if (searchArtist !== "") {
             searchArtist = searchArtist.replace(/\s+/g, '').toUpperCase();
             var artistResult = cloneDeep(allTracks.filter(t => stringSim.compareTwoStrings(searchArtist, String(t.artist_name).replace(/\s+/g, '').toUpperCase()) >= 0.50))
         }
 
+        //check if genre is empty
         if (searchGenre !== "") {
             searchGenre = searchGenre.replace(/\s+/g, '').toUpperCase();
             var genreTracks = cloneDeep(allTracks.filter(t => t.track_genres !== ""));
@@ -92,6 +105,7 @@ router.post('/trackSearch', async (req, res) => {
             var genreResult = cloneDeep(genreTracks.filter(t => t.track_genres.some(g => stringSim.compareTwoStrings(searchGenre, String(g.genre_title).replace(/\s+/g, '').toUpperCase()) >= 0.50)))
         }
 
+        //All possible combinations for search
         if (searchName !== "" && searchArtist !== "" && searchGenre !== "") {
             var result = nameResult.filter(t => artistResult.some(a => a.track_id === t.track_id) && genreResult.some(g => g.track_id === t.track_id));
         }
@@ -117,6 +131,7 @@ router.post('/trackSearch', async (req, res) => {
             return res.status(404).json({ errors: [{ msg: 'You should never be here: Something REALLY went wrong...' }] });
         }
 
+        //return result
         if (result.length === 0) {
             return res.status(404).json({ errors: [{ msg: 'No Tracks Found' }] });
         }

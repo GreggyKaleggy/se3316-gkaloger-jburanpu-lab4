@@ -5,7 +5,9 @@ const mongoose = require('mongoose');
 const db = mongoose.connection;
 
 
-//get all albums
+//@route    GET api/albums
+//@desc     NOT USED, GET request to get all albums
+//@access   Public - Not used
 router.get('/', async (req, res) => {
     try {
         const result = await db.collection('albums').find().toArray();

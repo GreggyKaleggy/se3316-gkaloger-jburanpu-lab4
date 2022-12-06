@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import ErrorDisplay from '../modules/errorDisplay';
 
 
+//function to show DMCA with formatting
 export default function Docs() {
     const admin = localStorage.getItem("isAdmin");
     const [results, setResults] = React.useState({});
@@ -16,6 +17,7 @@ export default function Docs() {
     title = results.title
     content = results.content
 
+    //get request to show DMCA doc
     useEffect(() => {
         fetch("/api/docs/find/638e6e10e86ca3056346be07")
             .then(res => res.json())
@@ -26,6 +28,7 @@ export default function Docs() {
             )
     }, [])
 
+    //put request to edit DMCA doc
     function editDoc() {
         const newName = titleRef.current.value
         const newContent = contentRef.current.value

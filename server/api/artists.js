@@ -6,7 +6,9 @@ const mongoose = require('mongoose');
 const db = mongoose.connection;
 
 
-// Get all artists
+//@route    GET api/artists
+//@desc     GET request to get all artists - from lab 3
+//@access   Public
 router.get('/', async (req, res) => {
     try {
         const results = await db.collection('artists').find().toArray();
@@ -22,7 +24,9 @@ router.get('/', async (req, res) => {
     }
 });
 
-//get artist by id
+//@route    GET api/artists/:id
+//@desc     GET request to get artist by id - from lab 3
+//@access   Public
 router.get('/:id', async (req, res) => {
     try {
         if (isNaN(req.params.id)) {
@@ -44,7 +48,9 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-//get artist by name
+//@route    GET api/artists/name/:name
+//@desc     GET request to get artist by name - from lab 3
+//@access   Public
 router.get('/name/:name', async (req, res) => {
     try {
         const search = req.params.name;

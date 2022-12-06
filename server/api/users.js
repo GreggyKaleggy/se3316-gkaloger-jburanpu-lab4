@@ -9,11 +9,15 @@ const auth = require("../middleware/auth");
 const config = require('../config');
 
 
-
+//@route    POST api/users/login
+//@desc     POST request to login a user
+//@access   Public
 router.post('/login', [
+    //Input validation using express-validator
     check('email', 'Please include valid email').isEmail().normalizeEmail(),
     check('password', 'Please enter valid password').isLength({ min: 6, max: 30 }).trim().escape()
 ], async (req, res) => {
+    //Display errors if any
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         var errorMsg = errors.array().map(error => error.msg);
@@ -21,14 +25,17 @@ router.post('/login', [
     }
     const { email, password } = req.body;
     try {
+        //Check if user exists
         let user = await userSchema.findOne({ email });
         if (!user) {
             return res.status(400).json({ errors: [{ msg: 'Invalid Credentials' }] });
         }
+        //Check if password is correct
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(400).json({ errors: [{ msg: 'Invalid Credentials' }] });
         }
+        //Check if user is deactivated
         if (user.deactivated) {
             return res.status(400).json({ errors: [{ msg: 'The account is deactivated, please contact an admin' }] });
         }
@@ -37,12 +44,15 @@ router.post('/login', [
                 id: user.id
             }
         }
+        //Return jsonwebtoken
         jwt.sign(payload, config.jwtSecret, { expiresIn: 360000 }, (err, token) => {
             if (err) throw err;
+            //if user is unverified, send a link to verify
             if (!user.verified) {
                 const link = req.protocol + '://' + req.get('host') + '/api/users/verify/' + user.email + '/' + token;
                 res.json({ verify: [{ msg: link }] });
             }
+            //else send the token
             else {
                 res.json({ token });
             }
@@ -55,11 +65,16 @@ router.post('/login', [
 });
 
 
+//@route    POST api/users/register
+//@desc     POST request to register a user
+//@access   Public
 router.post('/register', [
+    //Input validation using express-validator
     check('username', 'a username between 3 and 25 characters is required').not().isEmpty().trim().escape().isLength({ min: 3, max: 25 }),
     check('email', 'Please include valid email').isEmail().normalizeEmail(),
     check('password', 'Please enter valid password').isLength({ min: 6, max: 30 }).trim().escape()
 ], async (req, res) => {
+    //Display errors if any
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         var errorMsg = errors.array().map(error => error.msg);
@@ -67,10 +82,12 @@ router.post('/register', [
     }
     try {
         const { username, email, password } = req.body;
+        //Check if email exists
         let emailname = await User.findOne({ email });
         if (emailname) {
             return res.status(400).json({ errors: [{ msg: 'Email address is already associated with an account' }] });
         }
+        //Check if username has any special characters or numbers
         if (/[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(username)) {
             return res.status(400).json({ errors: [{ msg: 'Name should not contain any numbers or special characters' }] });
         }
@@ -79,6 +96,7 @@ router.post('/register', [
             email,
             password
         });
+        //Encrypt password
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(password, salt);
         await user.save();
@@ -87,12 +105,16 @@ router.post('/register', [
                 id: user.id
             }
         }
+
+        //Return jsonwebtoken
         jwt.sign(payload, config.jwtSecret, { expiresIn: 360000 }, (err, token) => {
             if (err) throw err;
+            //if user is unverified, send a link to verify
             if (!user.verified) {
                 const link = req.protocol + '://' + req.get('host') + '/api/users/verify/' + user.email + '/' + token;
                 res.json({ verify: [{ msg: link }] });
             }
+            //else send the token
             else {
                 res.json({ token });
             }
@@ -105,9 +127,14 @@ router.post('/register', [
 });
 
 
+//@route    PUT api/users/changepassword
+//@desc     PUT request to change password
+//@access   Private
 router.put('/changepassword', [
+    //Input validation using express-validator
     check('newPassword', 'Please enter valid password').isLength({ min: 6, max: 30 }).trim().escape()
 ], auth, async (req, res) => {
+    //Display errors if any
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         error = errors.array().map(error => error.msg);
@@ -115,19 +142,23 @@ router.put('/changepassword', [
     }
     try {
         const { email, oldPassword, newPassword } = req.body;
+        //Check if email exists
         let emailCheck = await User.findOne({ email });
         if (!emailCheck) {
             return res.status(400).json({ errors: [{ msg: 'Email address is not associated with any account' }] });
         }
+        //Check if password is correct
         const user = await User.findById(req.user.id).select('-password');
         const isMatch = await bcrypt.compare(oldPassword, emailCheck.password);
         if (!isMatch) {
             return res.status(400).json({ errors: [{ msg: 'The old password you entered is incorrect' }] });
         }
+        //Check if new password is same as old password
         const samePass = await bcrypt.compare(newPassword, emailCheck.password);
         if (samePass) {
             return res.status(400).json({ errors: [{ msg: 'The new password you entered is the same as the old password' }] });
         }
+        //Encrypt password
         const salt = await bcrypt.genSalt(10);
         emailCheck.password = await bcrypt.hash(newPassword, salt);
         await emailCheck.save()
@@ -140,6 +171,9 @@ router.put('/changepassword', [
 });
 
 
+//@route    GET api/users/verify/:email/:token
+//@desc     GET request to make a custom link using token to verify user
+//@access   Public - One per user and genereates a new token every time
 router.get('/verify/:email/:token', async (req, res) => {
     try {
         const { email, token } = req.params;
