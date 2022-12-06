@@ -4,7 +4,7 @@ import Landing from './landing/landingPage';
 import Home from './home/home';
 import ArtistsPage from './artists/artistsPage';
 import CreateList from './createList/createList';
-import ListsPage from './lists/listsPage';
+import MyLists from './myLists/myLists';
 import TracksPage from './tracks/tracksPage';
 import LoginPage from './login/login';
 import Logout from './logout/logout';
@@ -35,11 +35,11 @@ function App() {
     case "/Artists":
       Component = ArtistsPage;
       break
-    case "/createList":
+    case "/CreateList":
       Component = CreateList;
       break
-    case "/Lists":
-      Component = ListsPage;
+    case "/MyLists":
+      Component = MyLists;
       break
     case "/Tracks":
       Component = TracksPage;
