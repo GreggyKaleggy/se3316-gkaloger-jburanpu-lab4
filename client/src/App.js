@@ -5,7 +5,7 @@ import Home from './home/home';
 import ArtistsPage from './artists/artistsPage';
 import CreateList from './createList/createList';
 import MyLists from './myLists/myLists';
-import TracksPage from './tracks/tracksPage';
+import EditList from './editList/editList';
 import LoginPage from './login/login';
 import Logout from './logout/logout';
 import RegisterPage from './register/register';
@@ -41,8 +41,8 @@ function App() {
     case "/MyLists":
       Component = MyLists;
       break
-    case "/Tracks":
-      Component = TracksPage;
+    case "/EditList":
+      Component = EditList;
       break
     case "/AUP":
       Component = AUP;

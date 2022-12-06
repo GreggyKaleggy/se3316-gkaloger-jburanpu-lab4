@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import './home.css';
 import TrackList from '../modules/trackList';
 import ViewLists from '../modules/viewLists';
 
