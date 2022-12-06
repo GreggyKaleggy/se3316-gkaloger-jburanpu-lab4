@@ -2,6 +2,7 @@ import React from "react";
 
 
 export default function Logout (){
+    //logout the user by clearing the login data
     function logoutUser() {
         localStorage.clear();
         window.location = "/"

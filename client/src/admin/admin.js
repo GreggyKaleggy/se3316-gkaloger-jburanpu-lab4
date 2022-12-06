@@ -2,11 +2,15 @@ import React, { useState, useRef } from 'react';
 import ErrorDisplay from '../modules/errorDisplay';
 
 export default function Admin() {
+    //get admins sate
     const admin = localStorage.getItem("isAdmin");
+    //server state for error handling
     const [serverStatus, setServerStatus] = useState([])
 
+    //refs
     const userEmailRef = useRef()
 
+    //api call for making a specific user an admin using their email
     async function makeAdmin(e) {
         const email = userEmailRef.current.value
 
@@ -34,6 +38,7 @@ export default function Admin() {
             )
     }
 
+    //api call for deactivating a specific user using their email
     async function deactivateUser(e) {
         const email = userEmailRef.current.value
 

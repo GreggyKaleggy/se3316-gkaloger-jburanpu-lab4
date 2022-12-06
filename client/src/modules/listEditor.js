@@ -2,22 +2,26 @@ import React, { useState, useRef } from 'react';
 import ErrorDisplay from './errorDisplay';
 
 export default function ListEditor ({list}){
+    //states for editing a list, deleting a list, and the server status
     const [editState, setEditState] = useState(false)
     const [delState, setDelState] = useState(false)
     const [serverStatus, setServerStatus] = useState([])
     
-                
+    //save the list name           
     const listName = list.name
 
+    //user input refs
     const listNameRef = useRef()
     const listDescriptionRef = useRef()
     const tracksAddRef = useRef()
     const tracksDelRef = useRef()
     const listPrivRef = useRef()
 
+    //parse the list of track ids to be seperated by spaces
     var trackIDs = ""
     list.tracklist.forEach(t => trackIDs = trackIDs + String(t.track_id) + " ")
 
+    //toggle for displaying edit details
     async function ToggleEdit(e){
         if (!editState){
             setEditState(true)
@@ -26,6 +30,7 @@ export default function ListEditor ({list}){
         }
     }
 
+    //toggle for displaying delete details
     async function ToggleDelete(e){
         if (!delState){
             setDelState(true)
@@ -33,6 +38,8 @@ export default function ListEditor ({list}){
             setDelState(false)
         }
     }
+
+    //api call for editing a list's name and description
     async function EditList(e) {
         const name = listNameRef.current.value
         const desc = listDescriptionRef.current.value
@@ -63,6 +70,7 @@ export default function ListEditor ({list}){
           )
       }
 
+      //api call for adding tracks via a list of track IDS
       async function AddTracks (e){
         const track_ids = tracksAddRef.current.value
 
@@ -90,6 +98,7 @@ export default function ListEditor ({list}){
             )
       }
 
+      //api call for deleting tracks via a list of track IDS
       async function DeleteTracks (e){
         const track_ids = tracksDelRef.current.value
 
@@ -117,6 +126,7 @@ export default function ListEditor ({list}){
             )
       }
 
+      //api call to change the privacy of a given list
       async function ChangePriv (e){
         const priv = listPrivRef.current.checked
 
@@ -144,6 +154,7 @@ export default function ListEditor ({list}){
             )
       }
 
+      //api call to delete a given list
       async function DeleteList (e){
         fetch('/api/lists/deleteList', {
             method: 'DELETE',
@@ -214,6 +225,7 @@ export default function ListEditor ({list}){
             <b>Delete List</b>
             <br/>
             {!delState ? <input type="button" onClick = {ToggleDelete} defaultValue="Delete"/> : null}
+            {/*Delete list confirmation*/}
             {delState ? 
             <>
             <div> Are you sure you want to delete this list? </div> 

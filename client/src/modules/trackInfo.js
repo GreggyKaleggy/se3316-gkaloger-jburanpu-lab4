@@ -2,6 +2,7 @@ import React from "react";
 
 
 export default function TrackInfo ({trackInfo}){
+    //display track info for a given track
     return(
         <>
         <div className="InfoBox">

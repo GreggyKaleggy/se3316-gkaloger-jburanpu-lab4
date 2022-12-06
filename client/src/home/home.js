@@ -4,14 +4,17 @@ import ViewLists from '../modules/viewLists';
 import ErrorDisplay from '../modules/errorDisplay';
 
 function Home() {
+  //states for the server status, tracks, and recent lists
   const [serverStatus, setServerStatus] = useState([])
   const [tracks, setTracks] = useState([])
   const [lists, setLists] = useState([])
 
+  //user input refs
   const trackNameRef = useRef()
   const trackArtistRef = useRef()
   const trackGenreRef = useRef()
 
+  //load the 10 most recent visible lists as soon as the page loads
   useEffect(() => {
     let ignore = false;
 
@@ -19,6 +22,7 @@ function Home() {
     return () => { ignore = true; }
   }, []);
 
+  //api call for getting the 10 most recent public lists
   async function getLists(e) {
     fetch('/api/lists/')
       .then(response => response.json())
@@ -26,6 +30,7 @@ function Home() {
         setLists(data))
   }
 
+  //api call for searching by track using any combo of name, artist, and genre
   async function trackSearch(e) {
     const name = trackNameRef.current.value
     const artist = trackArtistRef.current.value

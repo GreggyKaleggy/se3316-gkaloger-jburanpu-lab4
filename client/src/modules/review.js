@@ -2,11 +2,15 @@ import React, { useState, useRef } from 'react';
 import ErrorDisplay from './errorDisplay';
 
 export default function Review ({reviews, listName}){
+    //get the user's admin state
     const admin = localStorage.getItem("isAdmin");
+    //user input ref
     const revPrivRef = useRef()
+    //server state
     const [serverStatus, setServerStatus] = useState([])
 
 
+    //api call to hide a given review
     async function hideReview(e) {
         const priv = revPrivRef.current.checked
 
@@ -36,6 +40,7 @@ export default function Review ({reviews, listName}){
     }
     return(
         <>
+        {/*Dont show hidden reviews*/}
         {!reviews.hidden ? 
         <div className="ReviewBox">
             <div>
@@ -50,6 +55,7 @@ export default function Review ({reviews, listName}){
             <br/>
         </div>
          : null}
+        {/*Admins can see an extra view for toggling review visibility*/}
         {admin === "true" ? <>
         <b>Admin Review Tools</b>
         <div>Review from {reviews.username}</div>
