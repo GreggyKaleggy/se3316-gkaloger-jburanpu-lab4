@@ -9,6 +9,7 @@ const auth = require("../middleware/auth");
 const config = require('../config');
 
 
+
 router.post('/login', [
     check('email', 'Please include valid email').isEmail().normalizeEmail(),
     check('password', 'Please enter valid password').isLength({ min: 6, max: 30 }).trim().escape()
@@ -39,8 +40,8 @@ router.post('/login', [
         jwt.sign(payload, config.jwtSecret, { expiresIn: 360000 }, (err, token) => {
             if (err) throw err;
             if (!user.verified) {
-                const link = '/api/users/verify/' + user.email + '/' + token;
-                return res.status(400).json({ errors: [{ msg: 'Please verify your email address at' + link }] });
+                const link = req.protocol + '://' + req.get('host') + '/api/users/verify/' + user.email + '/' + token;
+                res.json({ verify: [{ msg: 'Please verify your email address at ' + link }] });
             }
             else {
                 res.json({ token });
@@ -89,8 +90,8 @@ router.post('/register', [
         jwt.sign(payload, config.jwtSecret, { expiresIn: 360000 }, (err, token) => {
             if (err) throw err;
             if (!user.verified) {
-                const link = '/api/users/verify/' + user.email + '/' + token;
-                return res.status(400).json({ errors: [{ msg: 'Please verify your email address at' + link }] });
+                const link = req.protocol + '://' + req.get('host') + '/api/users/verify/' + user.email + '/' + token;
+                res.json({ verify: [{ msg: 'Please verify your email address at ' + link }] });
             }
             else {
                 res.json({ token });
@@ -138,21 +139,6 @@ router.put('/changepassword', [
     }
 });
 
-router.get('/verify', async (req, res) => {
-    try {
-        const user = await User.findById(req.user.id).select('-password');
-        if (user.verified) {
-            return res.status(400).json({ msg: 'Account already verified' });
-        }
-        const link = '/api/users/verify/' + user.email + '/' + req.header('x-auth-token');
-        res.json({ msg: 'Please verify your email by clicking here:' + link });
-
-    }
-    catch (err) {
-        console.error(err.message);
-        res.status(500).send('Internal Server Error');
-    }
-});
 
 router.get('/verify/:email/:token', async (req, res) => {
     try {
