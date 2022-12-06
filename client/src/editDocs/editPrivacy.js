@@ -12,7 +12,7 @@ export default function EditDocs() {
         const newContent = contentRef.current.value
 
         setServerStatus("Loading...")
-        fetch('/api/docs/editdoc/638bc20395dd56c0a23677cd', {
+        fetch('/api/docs/editdoc/638e6f91e86ca3056346be0a', {
             method: 'PUT',
             headers: {
                 'Accept': '/',
