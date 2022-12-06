@@ -1,13 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import jwt_decode from 'jwt-decode';
+import ErrorDisplay from '../modules/errorDisplay';
 
 
 export default function Docs() {
     const admin = localStorage.getItem("isAdmin");
     const [results, setResults] = React.useState({});
-    const [error, setError] = React.useState(null);
-    const [isLoaded, setIsLoaded] = React.useState(false);
     const [editState, setEditState] = useState(false)
+    const [serverStatus, setServerStatus] = useState([])
 
     const titleRef = useRef()
     const contentRef = useRef()
@@ -22,12 +21,7 @@ export default function Docs() {
             .then(res => res.json())
             .then(
                 (result) => {
-                    setIsLoaded(true);
                     setResults(result);
-                },
-                (error) => {
-                    setIsLoaded(true);
-                    setError(error);
                 }
             )
     }, [])
@@ -46,7 +40,11 @@ export default function Docs() {
         })
             .then(res => res.json())
             .then(data => {
-                window.location.reload()
+                if (data.errors) {
+                    setServerStatus(data.errors[0].msg)
+                } else {
+                    window.location.reload()
+                }
             })
     }
 
@@ -82,6 +80,7 @@ export default function Docs() {
                             <br />
                             <button onClick={editDoc}>Save</button>
                         </div>
+                        <ErrorDisplay errors={serverStatus} />
                     </div>
                 )}
             </div>

@@ -4,8 +4,6 @@ import React, { useEffect } from "react";
 
 export default function Docs() {
     const [results, setResults] = React.useState({});
-    const [error, setError] = React.useState(null);
-    const [isLoaded, setIsLoaded] = React.useState(false);
 
     useEffect(() => {
         fetch('/api/docs/instructions', {
@@ -18,12 +16,7 @@ export default function Docs() {
             .then(res => res.json())
             .then(
                 (result) => {
-                    setIsLoaded(true);
                     setResults(result);
-                },
-                (error) => {
-                    setIsLoaded(true);
-                    setError(error);
                 }
             )
     }, [])

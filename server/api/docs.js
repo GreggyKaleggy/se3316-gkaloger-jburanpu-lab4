@@ -25,9 +25,9 @@ router.post('/newdoc',
     check('title', 'Title is required').not().isEmpty(),
     check('content', 'Content is required, up to 1000 characters').not().isEmpty().isLength({ min: 1, max: 1000 }),
     auth, async (req, res) => {
-        const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
+            var errorMsg = errors.array().map(error => error.msg);
+            return res.status(400).json({ errors: [{ msg: errorMsg }] });
         }
         try {
             const currentUser = await userSchema.findById(req.user.id);
@@ -51,6 +51,11 @@ router.put('/editdoc/:id', [
     check('title', 'Title is required').not().isEmpty(),
     check('content', 'Content is required, up to 1000 characters').not().isEmpty().isLength({ min: 1, max: 1000 })
 ], auth, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        var errorMsg = errors.array().map(error => error.msg);
+        return res.status(400).json({ errors: [{ msg: errorMsg }] });
+    }
     try {
         const currentUser = await userSchema.findById(req.user.id);
         if (!currentUser.isAdmin) {
