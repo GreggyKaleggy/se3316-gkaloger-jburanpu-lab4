@@ -1,9 +1,8 @@
 import React, { useRef, useState } from "react"
+import ErrorDisplay from "../modules/errorDisplay"
 
 export default function Register() {
     const [serverStatus, setServerStatus] = useState([])
-    const listItems = serverStatus.map((error) => 
-                <li>{error}</li>)
 
     const usernameRef = useRef()
     const emailRef = useRef()
@@ -29,11 +28,7 @@ export default function Register() {
             response.json())
             .then(data => {
                 if (data.errors) {
-                    if (typeof data.errors[0].msg === 'string'){
-                        setServerStatus([data.errors[0].msg])
-                    }else{
-                        setServerStatus(data.errors[0].msg)
-                    }
+                    setServerStatus(data.errors[0].msg)
                 } else {
                     localStorage.setItem("x-auth-token", data.token);
                     localStorage.setItem("isLoggedIn", true);
@@ -75,9 +70,7 @@ export default function Register() {
                 <p>
                     Already have an account? <a href="/login">Log in</a>
                 </p>
-                <ul>
-                    {listItems}
-                </ul>
+                <ErrorDisplay errors = {serverStatus}/>
             </div>
         </div>
     )
