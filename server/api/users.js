@@ -38,7 +38,13 @@ router.post('/login', [
         }
         jwt.sign(payload, config.jwtSecret, { expiresIn: 360000 }, (err, token) => {
             if (err) throw err;
-            res.json({ token });
+            if (!user.verified) {
+                const link = '/api/users/verify/' + user.email + '/' + token;
+                return res.status(400).json({ errors: [{ msg: 'Please verify your email address at' + link }] });
+            }
+            else {
+                res.json({ token });
+            }
         });
     }
     catch (err) {
@@ -46,7 +52,6 @@ router.post('/login', [
         res.status(500).send('Server Error');
     }
 });
-
 
 
 router.post('/register', [
@@ -73,7 +78,6 @@ router.post('/register', [
             email,
             password
         });
-        //let error = user.validateSync();
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(password, salt);
         await user.save();
@@ -81,6 +85,10 @@ router.post('/register', [
             user: {
                 id: user.id
             }
+        }
+        const link = '/api/users/verify/' + user.email + '/' + req.header('x-auth-token');
+        if (!user.verified) {
+            return res.status(400).json({ errors: [{ msg: 'Please verify your email address at' + link }] });
         }
         jwt.sign(payload, config.jwtSecret, { expiresIn: 360000 }, (err, token) => {
             if (err) throw err;
@@ -128,7 +136,7 @@ router.put('/changepassword', [
     }
 });
 
-router.get('/verify', auth, async (req, res) => {
+router.get('/verify', async (req, res) => {
     try {
         const user = await User.findById(req.user.id).select('-password');
         if (user.verified) {
@@ -144,7 +152,7 @@ router.get('/verify', auth, async (req, res) => {
     }
 });
 
-router.get('/verify/:email/:token', auth, async (req, res) => {
+router.get('/verify/:email/:token', async (req, res) => {
     try {
         const { email, token } = req.params;
         const user = await User.findOne({ email });
