@@ -13,7 +13,6 @@ import AUP from './footerLinks/AUP';
 import DMCA from './footerLinks/DMCA';
 import Privacy from './footerLinks/Privacy';
 import Instructions from './footerLinks/Instructions';
-import EditAUP from './editDocs/editAUP';
 
 function App() {
   let Component
@@ -56,9 +55,6 @@ function App() {
       break
     case "/Instructions":
       Component = Instructions;
-      break
-    case "/EditAUP":
-      Component = EditAUP;
       break
     default:
       Component = Landing;

@@ -70,5 +70,18 @@ router.put('/reviewvisability/:list/:username', auth, async (req, res) => {
     }
 });
 
+router.get('/admincheck/:id', async (req, res) => {
+    try {
+        const currentUser = await userSchema.findById(req.params.id);
+        if (!currentUser.isAdmin) {
+            return res.status(401).json({ msg: 'You are not authorized to perform this action' });
+        }
+        res.json(currentUser);
+    }
+    catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
 
 module.exports = { router }

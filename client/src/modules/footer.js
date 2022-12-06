@@ -7,7 +7,7 @@ export default function Footer() {
     return (
         <nav className="footer">
             <div className="footer">
-                <ActiveLink href="/AUP">AUP</ActiveLink>
+                <ActiveLink href="/AUP">Acceptable Use Policy</ActiveLink>
                 <ActiveLink href="/DMCA">DMCA and Takedown Policy</ActiveLink>
                 <ActiveLink href="/Privacy">Privacy Policy</ActiveLink>
                 <ActiveLink href="/Instructions">DMCA Instructions for Admins</ActiveLink>

@@ -57,7 +57,7 @@ router.put('/editdoc/:id', [
             return res.status(401).json({ msg: 'You are not authorized to perform this action' });
         }
         const { title, content } = req.body;
-        const doc = await Docs.findOneAndUpdate({ _id: req.params.id }, { title, content }, { new: true });
+        const doc = await Docs.findOneAndUpdate({ _id: req.params.id }, { title, content, modified: Date.now() }, { new: true });
         if (!doc) {
             return res.status(404).json({ msg: 'Document not found' });
         }
@@ -104,7 +104,7 @@ router.get('/instructions', auth, async (req, res) => {
         if (!user.isAdmin) {
             return res.status(401).json({ msg: 'You are not authorized to perform this action' });
         }
-        const instruction = await instructions.find({ title: 'DMCA and Takedown Policy How to' });
+        const instruction = await instructions.findOne({ title: 'DMCA and Takedown Policy How to' });
         res.json(instruction);
     } catch (err) {
         console.error(err.message);

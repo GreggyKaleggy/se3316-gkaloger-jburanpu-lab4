@@ -1,13 +1,20 @@
 import React, { useEffect } from "react";
 
 
+
 export default function Docs() {
     const [results, setResults] = React.useState({});
     const [error, setError] = React.useState(null);
     const [isLoaded, setIsLoaded] = React.useState(false);
 
     useEffect(() => {
-        fetch("/api/docs/instructions")
+        fetch('/api/docs/instructions', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-auth-token': localStorage.getItem('x-auth-token')
+            },
+        })
             .then(res => res.json())
             .then(
                 (result) => {
@@ -21,17 +28,19 @@ export default function Docs() {
             )
     }, [])
 
+
+
     return (
         <>
             <div>
                 <div>
-                    <h3>Document Title</h3> <br></br>{results.title}
+                    <h3>{results.title}</h3><br />
                 </div>
                 <div>
-                    <h3>Content</h3> <br></br>{results.content}
+                    <p>{results.content}</p><br />
                 </div>
                 <div>
-                    <h3>Modified On</h3> <br></br>{results.modified}
+                    <h3>Modified On</h3><br />{results.modified}
                 </div>
             </div>
             <br />

@@ -70,7 +70,7 @@ router.post('/new', [
         for (let i = 0; i < tracksSliced.length; i++) {
             var findTrack = await db.collection('tracks').findOne({ track_id: tracksSliced[i] });
             if (!findTrack) {
-                return res.status(400).json({ errors:[{msg:'Track not found'}]});
+                return res.status(400).json({ errors: [{ msg: 'Track not found' }] });
             }
             else {
                 const trackDuration = findTrack.track_duration;
@@ -132,7 +132,7 @@ router.put('/editlist', [
             return res.status(400).json({ errors: [{ msg: "List doesn't exist" }] });
         }
         if (list.user != req.user.id) {
-            return res.status(400).json({ errors: [{msg: 'You are not authorized to edit this list'}] });
+            return res.status(400).json({ errors: [{ msg: 'You are not authorized to edit this list' }] });
         }
         const listName = await List.findOne({ name: newName });
         if (listName && list.user != req.user.id) {
@@ -140,6 +140,7 @@ router.put('/editlist', [
         }
         list.name = newName;
         list.description = newDesc;
+        list.modified = Date.now();
         await list.save();
         res.json(list);
     }
@@ -164,11 +165,11 @@ router.put('/addTracks', [
         const list = await List.findOne({ name: name });
 
         if (!list) {
-            return res.status(400).json({ errors: [{msg: 'List not found'}] });
+            return res.status(400).json({ errors: [{ msg: 'List not found' }] });
         }
 
         if (list.user != req.user.id) {
-            return res.status(400).json({ errors: [{msg: 'You are not authorized to edit this list'}] });
+            return res.status(400).json({ errors: [{ msg: 'You are not authorized to edit this list' }] });
         }
 
         var tracksSliced = track_ids.split(' ');
@@ -177,7 +178,7 @@ router.put('/addTracks', [
         for (let i = 0; i < tracksSliced.length; i++) {
             var findTrack = await db.collection('tracks').findOne({ track_id: tracksSliced[i] });
             if (!findTrack) {
-                return res.status(400).json({ errors: [{msg: 'Track not found'}] });
+                return res.status(400).json({ errors: [{ msg: 'Track not found' }] });
             }
 
             else {
@@ -205,7 +206,7 @@ router.put('/addTracks', [
             list.duration += list.tracklist[i].trackduration;
         }
         list.duration = Math.round(list.duration * 100) / 100;
-
+        list.modified = Date.now();
         await list.save();
         res.json(list);
 
@@ -234,10 +235,10 @@ router.delete('/deleteTracks', [
             return res.status(400).json({ errors: [{ msg: "List doesn't exist" }] });
         }
         if (list.user != req.user.id) {
-            return res.status(400).json({ errors: [{ msg: 'You are not authorized to edit this list'}] });
+            return res.status(400).json({ errors: [{ msg: 'You are not authorized to edit this list' }] });
         }
         if (list.tracklist.length == 0) {
-            return res.status(400).json({ errors: [{msg: 'List is empty'}] });
+            return res.status(400).json({ errors: [{ msg: 'List is empty' }] });
         }
         oldSize = list.tracklist.length;
         var tracksSliced = track_ids.split(' ');
@@ -258,6 +259,7 @@ router.delete('/deleteTracks', [
         for (let i = 0; i < list.tracklist.length; i++) {
             list.duration += list.tracklist[i].trackduration;
         }
+        list.modified = Date.now();
         await list.save();
         res.json(list);
     }
@@ -275,9 +277,10 @@ router.put('/changePrivacy', auth, async (req, res) => {
             return res.status(400).json({ errors: [{ msg: "List doesn't exist" }] });
         }
         if (list.user != req.user.id) {
-            return res.status(400).json({ errors: [{msg: 'You are not authorized to edit this list'}] });
+            return res.status(400).json({ errors: [{ msg: 'You are not authorized to edit this list' }] });
         }
-        console.log (value);
+        console.log(value);
+        list.modified = Date.now();
         list.isPrivate = value;
         await list.save();
         if (value == "true") {
@@ -303,7 +306,7 @@ router.delete('/deleteList', auth, async (req, res) => {
             return res.status(400).json({ errors: [{ msg: "List doesn't exist" }] });
         }
         if (list.user != req.user.id) {
-            return res.status(400).json({ errors: [{msg: 'You are not authorized to edit this list'}] });
+            return res.status(400).json({ errors: [{ msg: 'You are not authorized to edit this list' }] });
         }
         await list.remove();
         res.json("list deleted");
