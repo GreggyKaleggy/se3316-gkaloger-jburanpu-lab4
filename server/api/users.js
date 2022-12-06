@@ -133,7 +133,7 @@ router.post('/register', [
 router.put('/changepassword', [
     //Input validation using express-validator
     check('newPassword', 'Please enter valid password').isLength({ min: 6, max: 30 }).trim().escape()
-], auth, async (req, res) => {
+], async (req, res) => {
     //Display errors if any
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -147,8 +147,6 @@ router.put('/changepassword', [
         if (!emailCheck) {
             return res.status(400).json({ errors: [{ msg: 'Email address is not associated with any account' }] });
         }
-        //Check if password is correct
-        const user = await User.findById(req.user.id).select('-password');
         const isMatch = await bcrypt.compare(oldPassword, emailCheck.password);
         if (!isMatch) {
             return res.status(400).json({ errors: [{ msg: 'The old password you entered is incorrect' }] });
