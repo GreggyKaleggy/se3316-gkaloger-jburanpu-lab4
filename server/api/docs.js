@@ -47,7 +47,7 @@ router.post('/newdoc',
         }
     });
 
-router.put('/editdoc/:name', [
+router.put('/editdoc/:id', [
     check('title', 'Title is required').not().isEmpty(),
     check('content', 'Content is required, up to 1000 characters').not().isEmpty().isLength({ min: 1, max: 1000 })
 ], auth, async (req, res) => {
@@ -57,7 +57,7 @@ router.put('/editdoc/:name', [
             return res.status(401).json({ msg: 'You are not authorized to perform this action' });
         }
         const { title, content } = req.body;
-        const doc = await Docs.findOneAndUpdate({ title: req.params.name }, { $set: { title, content } }, { new: true });
+        const doc = await Docs.findOneAndUpdate({ _id: req.params.id }, { title, content }, { new: true });
         if (!doc) {
             return res.status(404).json({ msg: 'Document not found' });
         }
@@ -85,9 +85,9 @@ router.delete('/deletedoc/:name', auth, async (req, res) => {
     }
 });
 
-router.get('/find/:name', async (req, res) => {
+router.get('/find/:id', async (req, res) => {
     try {
-        const doc = await Docs.findOne({ title: req.params.name });
+        const doc = await Docs.findOne({ _id: req.params.id });
         if (!doc) {
             return res.status(404).json({ msg: 'Document not found' });
         }

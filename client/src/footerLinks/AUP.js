@@ -7,7 +7,7 @@ export default function Docs() {
     const [isLoaded, setIsLoaded] = React.useState(false);
 
     useEffect(() => {
-        fetch("/api/docs/find/Acceptable Use Policy")
+        fetch("/api/docs/find/638bc20395dd56c0a23677cd")
             .then(res => res.json())
             .then(
                 (result) => {

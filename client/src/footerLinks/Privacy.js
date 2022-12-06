@@ -7,7 +7,7 @@ export default function Docs() {
     const [isLoaded, setIsLoaded] = React.useState(false);
 
     useEffect(() => {
-        fetch("/api/docs/find/Privacy Policy")
+        fetch("/api/docs/find/638e6f91e86ca3056346be0a")
             .then(res => res.json())
             .then(
                 (result) => {
@@ -24,6 +24,7 @@ export default function Docs() {
     return (
         <>
             <div>
+                <button><a href="/EditAUP">Edit Document</a></button>
                 <div>
                     <h3>Document Title</h3> <br></br>{results.title}
                 </div>
