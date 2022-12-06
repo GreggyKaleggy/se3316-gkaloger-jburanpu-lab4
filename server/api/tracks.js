@@ -23,13 +23,13 @@ router.get('/', async (req, res) => {
 router.get('/trackID/:id', async (req, res) => {
     try {
         if (isNaN(req.params.id)) {
-            return res.status(404).json('Track ID must be an integer');
+            return res.status(404).json({ errors: [{msg:'Track ID must be an integer'}]});
         }
         if (req.params.id > 10000000) {
             return res.status(404).json({ errors: [{ msg: 'Enter a valid ID' }] })
         }
 
-        const result = await db.collection('tracks').findOne({ track_id: req.params.id }, { projection: { _id: 0, album_id: 1, album_title: 1, artist_id: 1, artist_name: 1, tags: 1, track_date_created: 1, track_date_recorded: 1, track_duration: 1, track_genres: 1, track_number: 1, track_title: 1} });
+        const result = await db.collection('tracks').findOne({ track_id: req.params.id }, { projection: { _id: 0, track_id:1, album_id: 1, album_title: 1, artist_id: 1, artist_name: 1, tags: 1, track_date_created: 1, track_date_recorded: 1, track_duration: 1, track_genres: 1, track_number: 1, track_title: 1} });
         if (!result) {
             return res.status(404).json({ errors: [{ msg: 'Track not found' }] });
         }

@@ -70,7 +70,7 @@ router.post('/new', [
         for (let i = 0; i < tracksSliced.length; i++) {
             var findTrack = await db.collection('tracks').findOne({ track_id: tracksSliced[i] });
             if (!findTrack) {
-                return res.status(400).json({ error: 'Track not found' });
+                return res.status(400).json({ errors:[{msg:'Track not found'}]});
             }
             else {
                 const trackDuration = findTrack.track_duration;
