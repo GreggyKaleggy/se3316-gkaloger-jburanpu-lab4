@@ -266,6 +266,33 @@ router.delete('/deleteTracks', [
     }
 })
 
+router.put('/changePrivacy', auth, async (req, res) => {
+    try {
+        const { name, value } = req.body;
+        const list = await List.findOne({ name: name });
+        if (!list) {
+            return res.status(400).json({ errors: [{ msg: "List doesn't exist" }] });
+        }
+        if (list.user != req.user.id) {
+            return res.status(400).json({ errors: [{msg: 'You are not authorized to edit this list'}] });
+        }
+        console.log (value);
+        list.isPrivate = value;
+        await list.save();
+        if (value == "true") {
+            res.json("list is now private");
+        }
+        else {
+            res.json("list is now public");
+        }
+
+    }
+    catch (err) {
+        console.error(err.message);
+        res.status(500).send('Internal Server Error');
+    }
+})
+
 //Delete a list
 router.delete('/delete/:name', auth, async (req, res) => {
     const user = await User.findById(req.user.id).select('-password');

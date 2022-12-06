@@ -12,6 +12,7 @@ export default function ListEditor ({list}){
     const listDescriptionRef = useRef()
     const tracksAddRef = useRef()
     const tracksDelRef = useRef()
+    const listPrivRef = useRef()
 
     var trackIDs = ""
     list.tracklist.forEach(t => trackIDs = trackIDs + String(t.track_id) + " ")
@@ -108,6 +109,33 @@ export default function ListEditor ({list}){
             )
       }
 
+      async function ChangePriv (e){
+        const priv = listPrivRef.current.checked
+
+        fetch('/api/lists/changePrivacy', {
+            method: 'PUT',
+            headers: {
+              'Accept': '/',
+              'Content-Type': 'application/json',
+              'x-auth-token': localStorage.getItem('x-auth-token')
+            },
+            body: JSON.stringify({
+              name : listName,
+              value: priv
+            })
+          }).then(response =>
+            response.json())
+            .then(data => {
+              if (data.errors) {
+                setServerStatus(`Error: ${data.errors[0].msg}`)
+              } else {
+                setServerStatus(`List ${listName} Updated!`)
+                
+              }
+            }
+            )
+      }
+
     return(
         <>
         <div className="EditBox">
@@ -147,9 +175,9 @@ export default function ListEditor ({list}){
             <br/>
             <b>Edit Privacy</b>
             <br/>
-            <label htmlFor="changePriv">List Privacy: </label>
-            <input ref={tracksAddRef} id = "changePriv" type="checkbox" defaultChecked = {list.isPrivate}/>
-            <input type="button" defaultValue="Save"/>
+            <label htmlFor="changePriv">Private? </label>
+            <input ref={listPrivRef} id = "changePriv" type="checkbox" defaultChecked = {list.isPrivate}/>
+            <input type="button" onClick = {ChangePriv} defaultValue="Save"/>
             <br/>
             <ErrorDisplay errors = {serverStatus}/>
             </> 
