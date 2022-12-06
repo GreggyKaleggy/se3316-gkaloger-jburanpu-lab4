@@ -4,15 +4,19 @@ import ErrorDisplay from "../modules/errorDisplay";
 
 
 export default function CreateList (){
+    //get login state
     const login = localStorage.getItem("isLoggedIn");
+    //server state for error handling
     const [serverStatus, setServerStatus] = useState([])
     
-
+    //refs
     const listNameRef = useRef()
     const listDescriptionRef = useRef()
     const tracksListRef = useRef()
 
+    //call for creating a list using a name, track IDs, and optional description
     async function CreateList(e) {
+        //get current inputed values
         const name = listNameRef.current.value
         const desc = listDescriptionRef.current.value
         const track_ids = tracksListRef.current.value
@@ -44,10 +48,12 @@ export default function CreateList (){
 
     return(
         <>
+        {/* This content is shown if the user isn't logged in  */}
         {!login ?  <>
         <h2>You must be logged in to create a list!!</h2>
         </>
         : null}
+        {/* This conent is shown if the user is logged in */}
         {login ?  <>
         <h2>Create a List!</h2>
         <hr/>

@@ -3,9 +3,11 @@ import TrackInfo from './trackInfo'
 const ytSearch = "https://www.youtube.com/results?search_query="
 
 export default function Track ({tracks}){
+    //states for track info and info expansion
     const [trackInfo, setTrackInfo] = useState([])
     const [expState, setExpState] = useState(false)
 
+    //get the additional track info when the view is expanded
     async function GetTrackInfo(e){
         if (!expState){
             setExpState(true)
@@ -20,12 +22,14 @@ export default function Track ({tracks}){
         }
     }
 
+    //function for opening a new tab with a youtube search containing the video details
     function YoutubeSearch(e){
         var ytPath = ytSearch + String(tracks.track_title) + String(tracks.artist_name)
         window.open(ytPath,"_Blank")
     }
 
     var genres = []
+    //parse the genres data so it displays nicely. Extract all the genre titles
     if (tracks.track_genres !== ""){
         var genreData = JSON.parse(String(tracks.track_genres).replace(/'/g, '"'))
         for (let i = 0; i < Object.keys(genreData).length; i++){
@@ -57,6 +61,7 @@ export default function Track ({tracks}){
             </div>
             <button onClick={GetTrackInfo}>Show Track Info</button>
         </div>
+        {/*show the track info when expanded*/}
         {expState ? <TrackInfo trackInfo = {trackInfo}/> : null}
     <br/>
     </>)

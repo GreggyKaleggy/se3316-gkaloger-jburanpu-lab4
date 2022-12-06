@@ -1,7 +1,7 @@
-import './landing.css';
 import Footer from '../modules/footer';
 
 function Landing() {
+  //check the user's logged in state
   const login = localStorage.getItem("isLoggedIn");
 
   return (
@@ -12,6 +12,7 @@ function Landing() {
         <hr />
         <h2>Log-in</h2>
         <h3>Unauthenticated users have limited functionality! Make sure to authenticate your account!</h3>
+        {/*Hide the login / register links if the user is already signed in*/}
         {!login ? <p>Want to join? <a href="/register">Register</a> or <a href="/login">Log in</a> today!</p> : null}
         <h2>Unauthenticated user Functionality:</h2>
         <hr />

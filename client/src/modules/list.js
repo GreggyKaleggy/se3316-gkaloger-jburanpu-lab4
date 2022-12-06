@@ -5,15 +5,20 @@ import ErrorDisplay from './errorDisplay';
 
 
 export default function List ({list}){
+    //get the user's logged in state
     const login = localStorage.getItem("isLoggedIn");
+
+    //states for details, reviews, adding reviews, and server status
     const [detState, setDetState] = useState(false)
     const [revState, setRevState] = useState(false)
     const [addRevState, setAddRevState] = useState(false)
     const [serverStatus, setServerStatus] = useState([])
 
+    //user input refs
     const revCommentRef = useRef()
     const revRatingRef = useRef()
 
+    //toggle for showing / hiding details
     function showDetails(e){
         if (!detState){
             setDetState(true)
@@ -21,6 +26,7 @@ export default function List ({list}){
             setDetState(false)
         }
     }
+    //toggle for showing / hiding reviews
     function showReviews(e){
         if (!revState){
             setRevState(true)
@@ -28,7 +34,7 @@ export default function List ({list}){
             setRevState(false)
         }
     }
-
+    //toggle for showing / hiding adding a review
     function confirmAddReview(e){
         if (!addRevState){
             setAddRevState(true)
@@ -37,6 +43,7 @@ export default function List ({list}){
         }
     }
 
+    //api call for adding a review using rating and comment
     async function AddReview(e){
         const rating = revRatingRef.current.value
         const review = revCommentRef.current.value
@@ -91,6 +98,7 @@ export default function List ({list}){
             
             <button onClick={showDetails}>View Details</button> 
             <button onClick= {showReviews}>View Reviews</button>
+            {/*Hide the details if toggled*/}
             {detState ? <div>
                 <h4>Additional Details</h4>
                 <div>
@@ -104,6 +112,7 @@ export default function List ({list}){
                 </h4>
                 <TrackList tracks = {list.tracklist}/>
             </div> : null}
+            {/*Hide the reviews if toggled*/}
             {revState ? <div>
                 <h4>
                 Reviews: 
@@ -122,6 +131,7 @@ export default function List ({list}){
                 <input ref={revCommentRef} id = "revComment" type="text" placeholder="Comment"/>
                 <br/>
                 {!addRevState ? <input type="button" onClick = {confirmAddReview} defaultValue="Submit Review"/> : null}
+                {/*confirmation for adding a review*/}
                 {addRevState ?
                 <>
                 <div> Are you sure you want to add this review? </div> 

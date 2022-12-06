@@ -4,10 +4,13 @@ import ErrorDisplay from "./errorDisplay";
 
 
 export default function IDSearch (){
+    //user input ref
     const trackIDRef = useRef()
+    //states for tracks and server status
     const [tracks, setTracks] = useState([])
     const [serverStatus, setServerStatus] = useState([])
 
+    //api call for getting a track by ID
     async function trackIDSearch(e) {
       setServerStatus("Loading...")
       fetch('/api/tracks/trackID/'+trackIDRef.current.value)

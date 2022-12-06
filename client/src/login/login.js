@@ -2,16 +2,20 @@ import React, { useRef, useState } from "react"
 import ErrorDisplay from "../modules/errorDisplay"
 
 export default function Login(props) {
+    //states for the server status and user email verification
     const [serverStatus, setServerStatus] = useState([])
     const [verify, setVerify] = useState("")
 
+    //input refs
     const emailRef = useRef()
     const passwordRef = useRef()
     
+    //hookup for opening the verify email link with a button
     function verifyEmail(){
         window.open(verify, "_Blank")
     }
 
+    //api call for allowing the user to log in using their username and password
     async function loginUser(e) {
         const email = emailRef.current.value
         const password = passwordRef.current.value
@@ -31,11 +35,14 @@ export default function Login(props) {
             .then(data => {
                 if (data.errors) {
                     setServerStatus(data.errors[0].msg)
+                //display a message if the user needs to verify their account
                 } else if (data.verify) {
                     setVerify(data.verify[0].msg)
                 } else {
+                    //if the user logs in successfully, save their token and log-in state
                     localStorage.setItem("x-auth-token", data.token);
                     localStorage.setItem("isLoggedIn", true);
+                    //nested API call to get the user's admin status as they log in
                     fetch('/api/admins/admincheck', {
                         method: 'get',
                         headers: {
@@ -49,6 +56,7 @@ export default function Login(props) {
                             if (data.errors) {
                                 console.log("Uh Oh, this shouldn't happen")
                             } else {
+                                //store the admin status
                                 localStorage.setItem("isAdmin", data.isAdmin)
                                 window.location = "/"
                             }
