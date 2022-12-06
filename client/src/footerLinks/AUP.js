@@ -25,13 +25,13 @@ export default function Docs() {
         <>
             <div>
                 <div>
-                    Document Title: {results.title}
+                    <h3>Document Title</h3> <br></br>{results.title}
                 </div>
                 <div>
-                    Content: {results.content}
+                    <h3>Content</h3> <br></br>{results.content}
                 </div>
                 <div>
-                    Modified On: {results.modified}
+                    <h3>Modified On</h3> <br></br>{results.modified}
                 </div>
             </div>
             <br />
