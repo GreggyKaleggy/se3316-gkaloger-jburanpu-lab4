@@ -1,13 +1,17 @@
 import React, { useState, useRef } from 'react';
+import ErrorDisplay from './errorDisplay';
 
 export default function ListEditor ({list}){
     const [editState, setEditState] = useState(false)
-    const [serverStatus, setServerStatus] = useState("")
+    const [serverStatus, setServerStatus] = useState([])
+    
+                
     const listName = list.name
 
     const listNameRef = useRef()
     const listDescriptionRef = useRef()
-    const tracksListRef = useRef()
+    const tracksAddRef = useRef()
+    const tracksDelRef = useRef()
 
     var trackIDs = ""
     list.tracklist.forEach(t => trackIDs = trackIDs + String(t.track_id) + " ")
@@ -23,7 +27,7 @@ export default function ListEditor ({list}){
     async function EditList(e) {
         const name = listNameRef.current.value
         const desc = listDescriptionRef.current.value
-        const track_ids = tracksListRef.current.value
+
     
         setServerStatus("Loading...")
         fetch('/api/lists/editlist', {
@@ -50,6 +54,60 @@ export default function ListEditor ({list}){
           )
       }
 
+      async function AddTracks (e){
+        const track_ids = tracksAddRef.current.value
+
+        fetch('/api/lists/addTracks', {
+            method: 'PUT',
+            headers: {
+              'Accept': '/',
+              'Content-Type': 'application/json',
+              'x-auth-token': localStorage.getItem('x-auth-token')
+            },
+            body: JSON.stringify({
+              name : listName,
+              track_ids: track_ids
+            })
+          }).then(response =>
+            response.json())
+            .then(data => {
+              if (data.errors) {
+                setServerStatus(`Error: ${data.errors[0].msg}`)
+              } else {
+                setServerStatus(`List ${listName} Updated!`)
+                
+              }
+            }
+            )
+      }
+
+      async function DeleteTracks (e){
+        const track_ids = tracksDelRef.current.value
+
+        fetch('/api/lists/deleteTracks', {
+            method: 'DELETE',
+            headers: {
+              'Accept': '/',
+              'Content-Type': 'application/json',
+              'x-auth-token': localStorage.getItem('x-auth-token')
+            },
+            body: JSON.stringify({
+              name : listName,
+              track_ids: track_ids
+            })
+          }).then(response =>
+            response.json())
+            .then(data => {
+              if (data.errors) {
+                setServerStatus(`Error: ${data.errors[0].msg}`)
+              } else {
+                setServerStatus(`List ${listName} Updated!`)
+                
+              }
+            }
+            )
+      }
+
     return(
         <>
         <div className="EditBox">
@@ -60,20 +118,40 @@ export default function ListEditor ({list}){
                 Number of Tracks: {list.numberofTracks}
             </div>
             <button onClick = {ToggleEdit}>Edit List</button>
-            <div>{serverStatus}</div>
             {editState ? 
             <>
             <br/>
-            <label for="listName">List Name: </label>
+            <br/>
+            <b>Edit Name and Description</b>
+            <br/>
+            <label htmlFor="listName">List Name: </label>
             <input ref={listNameRef} id = "listName" type="text" placeholder="List Name" defaultValue={list.name}/>
             <br/>
-            <label for="listDesc">List Description: </label>
+            <label htmlFor="listDesc">List Description: </label>
             <input ref={listDescriptionRef} id = "listDesc" type="text" placeholder="Description (Optional)" defaultValue = {list.desc}/>
             <br/>
-            <label for="trackIDs">Track IDs: </label>
-            <input ref={tracksListRef} id = "trackIDs" type="text" placeholder="Tracks" defaultValue = {trackIDs}/>
+            <input type="button" onClick = {EditList} defaultValue="Save"/>
             <br/>
-            <input type="button" onClick = {EditList} defaultValue="Submit"/>
+            <br/>
+            <b>Edit Tracks</b>
+            <br/>
+            <div>Track IDs: {trackIDs}</div>
+            <label htmlFor="addIDs">Add tracks by ID: </label>
+            <input ref={tracksAddRef} id = "addIDs" type="text" placeholder="Track IDs"/>
+            <input type="button" onClick = {AddTracks} defaultValue="Add"/>
+            <br/>
+            <label htmlFor="delIDs">Delete tracks by ID: </label>
+            <input ref={tracksDelRef} id = "delIDs" type="text" placeholder="Track IDs"/>
+            <input type="button" onClick = {DeleteTracks} defaultValue="Delete"/>
+            <br/>
+            <br/>
+            <b>Edit Privacy</b>
+            <br/>
+            <label htmlFor="changePriv">List Privacy: </label>
+            <input ref={tracksAddRef} id = "changePriv" type="checkbox" defaultChecked = {list.isPrivate}/>
+            <input type="button" defaultValue="Save"/>
+            <br/>
+            <ErrorDisplay errors = {serverStatus}/>
             </> 
             : null}
 

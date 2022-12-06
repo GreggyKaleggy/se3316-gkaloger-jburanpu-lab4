@@ -1,9 +1,8 @@
 import React, { useRef, useState } from "react"
+import ErrorDisplay from "../modules/errorDisplay"
 
 export default function Login (props) {
     const [serverStatus, setServerStatus] = useState([])
-    const listItems = serverStatus.map((error) => 
-                <li>{error}</li>)
 
     const emailRef = useRef()
     const passwordRef = useRef()
@@ -26,11 +25,7 @@ export default function Login (props) {
             response.json())
             .then(data => {
                 if (data.errors) {
-                    if (typeof data.errors[0].msg === 'string'){
-                        setServerStatus([data.errors[0].msg])
-                    }else{
-                        setServerStatus(data.errors[0].msg)
-                    }
+                    setServerStatus(data.errors[0].msg)
                 } else {
                     localStorage.setItem("x-auth-token", data.token);
                     localStorage.setItem("isLoggedIn", true);
@@ -66,9 +61,7 @@ export default function Login (props) {
                 <p>
                     Don't have an account? <a href="/register">Register</a> today!
                 </p>
-                <ul>
-                    {listItems}
-                </ul>
+                <ErrorDisplay errors = {serverStatus}/>
             </div>
         </div>
     )

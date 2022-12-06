@@ -119,7 +119,11 @@ router.put('/editlist', [
     check('newName', 'List name between 3 and 20 characters is required').not().isEmpty().isLength({ min: 3, max: 30 }),
     check('newDesc', 'Description can be a maximum 1000 characters').isLength({ min: 0, max: 1000 }),
 ], auth, async (req, res) => {
-    console.log("Hello")
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        var errorMsg = errors.array().map(error => error.msg);
+        return res.status(400).json({ errors: [{ msg: errorMsg }] });
+    }
     try {
         const { name, newName, newDesc } = req.body;
         const list = await List.findOne({ name: name });
@@ -130,7 +134,7 @@ router.put('/editlist', [
             return res.status(400).json({ errors: [{msg: 'You are not authorized to edit this list'}] });
         }
         const listName = await List.findOne({ name: newName });
-        if (listName) {
+        if (listName && list.user != req.user.id) {
             return res.status(400).json({ errors: [{ msg: "List name is already taken" }] });
         }
         list.name = newName;
@@ -145,25 +149,25 @@ router.put('/editlist', [
 })
 
 //Add a track to a list
-router.put('/add/:name', [
+router.put('/addTracks', [
     check('name', 'List ID is required').not().isEmpty(),
     check('track_ids', 'Track ID is required').not().isEmpty().isLength({ min: 1, max: 100 }),
 ], auth, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        error = errors.array().map(error => error.msg);
-        return res.status(400).json({ error });
+        var errorMsg = errors.array().map(error => error.msg);
+        return res.status(400).json({ errors: [{ msg: errorMsg }] });
     }
     try {
-        const { track_ids } = req.body;
-        const list = await List.findOne({ name: req.params.name });
+        const { name, track_ids } = req.body;
+        const list = await List.findOne({ name: name });
 
         if (!list) {
-            return res.status(400).json({ error: 'List not found' });
+            return res.status(400).json({ errors: [{msg: 'List not found'}] });
         }
 
         if (list.user != req.user.id) {
-            return res.status(400).json({ error: 'You are not authorized to edit this list' });
+            return res.status(400).json({ errors: [{msg: 'You are not authorized to edit this list'}] });
         }
 
         var tracksSliced = track_ids.split(' ');
@@ -172,7 +176,7 @@ router.put('/add/:name', [
         for (let i = 0; i < tracksSliced.length; i++) {
             var findTrack = await db.collection('tracks').findOne({ track_id: tracksSliced[i] });
             if (!findTrack) {
-                return res.status(400).json({ error: 'Track not found' });
+                return res.status(400).json({ errors: [{msg: 'Track not found'}] });
             }
 
             else {
@@ -212,6 +216,55 @@ router.put('/add/:name', [
     }
 });
 
+//Delete a track from a list
+router.delete('/deleteTracks', [
+    check('name', 'List name is required').not().isEmpty(),
+    check('track_ids', 'Track ID is required').not().isEmpty().isLength({ min: 1, max: 100 }),
+], auth, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        var errorMsg = errors.array().map(error => error.msg);
+        return res.status(400).json({ errors: [{ msg: errorMsg }] });
+    }
+    try {
+        const { name, track_ids } = req.body;
+        const list = await List.findOne({ name: name });
+        if (!list) {
+            return res.status(400).json({ errors: [{ msg: "List doesn't exist" }] });
+        }
+        if (list.user != req.user.id) {
+            return res.status(400).json({ errors: [{ msg: 'You are not authorized to edit this list'}] });
+        }
+        if (list.tracklist.length == 0) {
+            return res.status(400).json({ errors: [{msg: 'List is empty'}] });
+        }
+        oldSize = list.tracklist.length;
+        var tracksSliced = track_ids.split(' ');
+        tracksSliced = [...new Set(tracksSliced)];
+        for (let i = 0; i < tracksSliced.length; i++) {
+            for (let j = 0; j < list.tracklist.length; j++) {
+                if (list.tracklist[j].track_id == tracksSliced[i]) {
+                    list.tracklist.splice(j, 1);
+                }
+            }
+        }
+        newSize = list.tracklist.length;
+        if (oldSize == newSize) {
+            return res.status(400).json({ errors: [{ msg: 'Track not found in list' }] });
+        }
+        list.numberofTracks = list.tracklist.length;
+        list.duration = 0;
+        for (let i = 0; i < list.tracklist.length; i++) {
+            list.duration += list.tracklist[i].trackduration;
+        }
+        await list.save();
+        res.json(list);
+    }
+    catch (err) {
+        console.error(err.message);
+        res.status(500).send('Internal Server Error');
+    }
+})
 
 //Delete a list
 router.delete('/delete/:name', auth, async (req, res) => {
@@ -231,50 +284,6 @@ router.delete('/delete/:name', auth, async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 })
-
-
-//Delete a track from a list
-router.delete('/deletetrack/:name', auth, async (req, res) => {
-    try {
-        const list = await List.findOne({ name: req.params.name });
-        const { track_ids } = req.body;
-        if (!list) {
-            return res.status(400).json({ errors: [{ msg: "List doesn't exist" }] });
-        }
-        if (list.user != req.user.id) {
-            return res.status(400).json({ error: 'You are not authorized to edit this list' });
-        }
-        if (list.tracklist.length == 0) {
-            return res.status(400).json({ error: 'List is empty' });
-        }
-        oldSize = list.tracklist.length;
-        var tracksSliced = track_ids.split(' ');
-        tracksSliced = [...new Set(tracksSliced)];
-        for (let i = 0; i < tracksSliced.length; i++) {
-            for (let j = 0; j < list.tracklist.length; j++) {
-                if (list.tracklist[j].track_id == tracksSliced[i]) {
-                    list.tracklist.splice(j, 1);
-                }
-            }
-        }
-        newSize = list.tracklist.length;
-        if (oldSize == newSize) {
-            return res.status(400).json({ error: 'Track not found in list' });
-        }
-        list.numberofTracks = list.tracklist.length;
-        list.duration = 0;
-        for (let i = 0; i < list.tracklist.length; i++) {
-            list.duration += list.tracklist[i].trackduration;
-        }
-        await list.save();
-        res.json(list);
-    }
-    catch (err) {
-        console.error(err.message);
-        res.status(500).send('Internal Server Error');
-    }
-})
-
 
 //leave reviews on a list
 router.post('/review/:name', [
