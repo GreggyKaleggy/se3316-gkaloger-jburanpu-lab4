@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const db = mongoose.connection;
 const stringSim = require('string-similarity');
 var cloneDeep = require('lodash.clonedeep');
+const { check, validationResult } = require('express-validator');
 
 //@route    GET api/tracks
 //@desc     GET request to get all tracks - from lab 3 and not used
@@ -76,7 +77,18 @@ router.get('/search/:title', async (req, res) => {
 //@route    POST api/tracks/trackSearch
 //@desc     POST request to get a track by track title + artist name + genre, or any combination of the three
 //@access   Public
-router.post('/trackSearch', async (req, res) => {
+router.post('/trackSearch', [
+    //Input validation using express-validator
+    check('searchName', 'Please enter valid track name').isLength({ min: 0, max: 30 }).trim().escape(),
+    check('searchArtist', 'Please enter valid artist').isLength({ min: 0, max: 30 }).trim().escape(),
+    check('searchGenre', 'Please enter valid genre').isLength({ min: 0, max: 30 }).trim().escape()
+], async (req, res) => {
+    //Display errors if any
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        var errorMsg = errors.array().map(error => error.msg);
+        return res.status(400).json({ errors: [{ msg: errorMsg }] });
+    }
     // Get the search parameters from the request body
     var { searchName, searchArtist, searchGenre } = req.body
     if (searchName == "" && searchArtist == "" && searchGenre == "") {
