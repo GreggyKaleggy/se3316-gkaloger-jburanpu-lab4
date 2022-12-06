@@ -7,7 +7,7 @@ export default function Docs() {
     const [isLoaded, setIsLoaded] = React.useState(false);
 
     useEffect(() => {
-        fetch("/api/docs/find/DMCA")
+        fetch("/api/docs/find/DMCA & Takedown Policy")
             .then(res => res.json())
             .then(
                 (result) => {

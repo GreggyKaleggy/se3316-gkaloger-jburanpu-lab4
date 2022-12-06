@@ -1,16 +1,24 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect } from "react";
 
 
-const Docs = (props) => {
-    const [results, setResults] = useState({})
-    const id = props.id;
+export default function Docs() {
+    const [results, setResults] = React.useState({});
+    const [error, setError] = React.useState(null);
+    const [isLoaded, setIsLoaded] = React.useState(false);
 
     useEffect(() => {
-        fetch(`/api/docs/find/${id}`)
+        fetch("/api/docs/find/Privacy Policy")
             .then(res => res.json())
-            .then(data => {
-                setResults(data);
-            });
+            .then(
+                (result) => {
+                    setIsLoaded(true);
+                    setResults(result);
+                },
+                (error) => {
+                    setIsLoaded(true);
+                    setError(error);
+                }
+            )
     }, [])
 
     return (
@@ -30,5 +38,3 @@ const Docs = (props) => {
         </>
     )
 }
-
-export default Docs;
