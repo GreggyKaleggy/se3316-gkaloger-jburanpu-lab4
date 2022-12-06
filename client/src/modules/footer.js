@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import docs from "../footerLinks/Privacy";
 
 
 export default function Footer() {
@@ -6,20 +7,21 @@ export default function Footer() {
     return (
         <nav className="footer">
             <div className="footer">
-                <ActiveLink href="/Docs">AUP</ActiveLink>
-                <ActiveLink href="/Docs">DMCA and Takedown Policy</ActiveLink>
-                <ActiveLink href="/Docs">Privacy Policy</ActiveLink>
-                <ActiveLink href="/Docs">DMCA Instructions for Admins</ActiveLink>
+                <ActiveLink href="/AUP">AUP</ActiveLink>
+                <ActiveLink href="/DMCA">DMCA and Takedown Policy</ActiveLink>
+                <ActiveLink href="/Privacy">Privacy Policy</ActiveLink>
+                <ActiveLink href="/Instructions">DMCA Instructions for Admins</ActiveLink>
             </div>
         </nav>
     )
 
-    function ActiveLink({ href, children, ...props }) {
+    function ActiveLink({ href, id, children, ...props }) {
         const path = window.location.pathname
         return (
             <a className={path === href ? "active" : ""} href={href} {...props}>{children}</a>
         );
     }
+
 }
 
 

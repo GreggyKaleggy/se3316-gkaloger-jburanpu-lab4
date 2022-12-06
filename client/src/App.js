@@ -9,8 +9,10 @@ import TracksPage from './tracks/tracksPage';
 import LoginPage from './login/login';
 import Logout from './logout/logout';
 import RegisterPage from './register/register';
-import Docs from './footerLinks/docs';
-
+import AUP from './footerLinks/AUP';
+import DMCA from './footerLinks/DMCA';
+import Privacy from './footerLinks/Privacy';
+import Instructions from './footerLinks/Instructions';
 
 function App() {
   let Component
@@ -42,8 +44,17 @@ function App() {
     case "/Tracks":
       Component = TracksPage;
       break
-    case "/Docs":
-      Component = Docs;
+    case "/AUP":
+      Component = AUP;
+      break
+    case "/Privacy":
+      Component = Privacy;
+      break
+    case "/DMCA":
+      Component = DMCA;
+      break
+    case "/Instructions":
+      Component = Instructions;
       break
     default:
       Component = Landing;
