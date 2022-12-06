@@ -319,25 +319,25 @@ router.delete('/deleteList', auth, async (req, res) => {
 })
 
 //leave reviews on a list
-router.post('/review/:name', [
+router.post('/review', [
     check('rating', 'Rating from 1 to 5 is required').not().isEmpty().isInt({ min: 1, max: 5 }),
     check('review', 'Review is optional upto 200 characters').not().isEmpty().isLength({ min: 0, max: 200 })
 ], auth, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        error = errors.array().map(error => error.msg);
-        return res.status(400).json({ error });
+        var errorMsg = errors.array().map(error => error.msg);
+        return res.status(400).json({ errors: [{ msg: errorMsg }] });
     }
     try {
         const reviewer = await User.findById(req.user.id)
-        const { rating, review } = req.body;
+        const { name, rating, review } = req.body;
         const reviews = {
             username: reviewer.username,
             rating,
             review,
             hidden: false
         }
-        const list = await List.findOne({ name: req.params.name });
+        const list = await List.findOne({ name: name });
         for (let i = 0; i < list.reviews.length; i++) {
             if (list.reviews[i].username == reviewer.username) {
                 return res.status(400).json({ errors: [{ msg: "You have already reviewed this list" }] });
