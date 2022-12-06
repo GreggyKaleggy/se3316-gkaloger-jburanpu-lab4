@@ -24,7 +24,7 @@ export default function Docs() {
     return (
         <>
             <div>
-                <button href="/editdoc">Edit Document</button>
+                <button><a href="/EditAUP">Edit Document</a></button>
                 <div>
                     <h3>Document Title</h3> <br></br>{results.title}
                 </div>

@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 
-export default function editDocs() {
+export default function EditDocs() {
     const login = localStorage.getItem("isLoggedIn");
     const [serverStatus, setServerStatus] = useState("")
 
@@ -20,8 +20,8 @@ export default function editDocs() {
                 'x-auth-token': localStorage.getItem('x-auth-token')
             },
             body: JSON.stringify({
-                newName: newName,
-                newContent: newContent
+                title: newName,
+                content: newContent
             })
         }).then(response =>
             response.json())
