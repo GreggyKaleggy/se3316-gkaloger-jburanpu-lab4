@@ -70,13 +70,13 @@ router.put('/reviewvisability/:list/:username', auth, async (req, res) => {
     }
 });
 
-router.get('/admincheck/:id', async (req, res) => {
+router.get('/admincheck/:name', async (req, res) => {
     try {
-        const currentUser = await userSchema.findById(req.params.id);
-        if (!currentUser.isAdmin) {
-            return res.status(401).json({ msg: 'You are not authorized to perform this action' });
+        const user = await User.findOne({ username: req.params.name });
+        if (!user) {
+            return res.status(400).json({ errors: [{ msg: 'User not found' }] });
         }
-        res.json(currentUser);
+        res.json(user);
     }
     catch (err) {
         console.error(err.message);

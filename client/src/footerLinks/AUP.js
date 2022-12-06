@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import jwt_decode from 'jwt-decode';
 
 
 
@@ -56,30 +55,6 @@ export default function Docs() {
             })
     }
 
-    function isAdmin() {
-        const token = localStorage.getItem('x-auth-token')
-        if (token) {
-            const decoded = jwt_decode(token)
-            const user = decoded.user
-            const id = user.id
-            fetch(`/api/admins/admincheck/${id}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.isAdmin) {
-                        console.log("Admin")
-                        return true
-                    }
-                    else {
-                        console.log("Not Admin")
-                        return false
-                    }
-                })
-        }
-        else {
-            return false
-        }
-    }
-
     return (
         <>
             <div>
@@ -95,7 +70,7 @@ export default function Docs() {
                 <hr></hr>
                 <br />
                 <div className="EditBox">
-                    {isAdmin && < button onClick={() => setEditState(!editState)}>Edit</button>}
+                    <button onClick={() => setEditState(!editState)}>Edit</button>
                     {editState && (
                         <div>
                             <h2>Edit Document</h2>
