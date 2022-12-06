@@ -67,14 +67,13 @@ router.put('/deactivate', [
 });
 
 //admin ability to hide reviews
-router.put('/reviewvisability/:list/:username', auth, async (req, res) => {
+router.put('/reviewvisability', auth, async (req, res) => {
     try {
         const currentUser = await userSchema.findById(req.user.id);
         if (!currentUser.isAdmin) {
-            return res.status(401).json({ msg: 'You are not authorized to perform this action' });
+            return res.status(401).json({ errors: [{msg: 'You are not authorized to perform this action'}] });
         }
-        const { list, username } = req.params;
-        const { hidden } = req.body;
+        const { list, username, hidden } = req.body;
         const updatedReview = await List.findOneAndUpdate({ name: list }, { $set: { 'reviews.$[elem].hidden': hidden } }, { arrayFilters: [{ 'elem.username': username }], new: true });
         res.json(updatedReview);
     }

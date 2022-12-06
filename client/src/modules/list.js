@@ -108,7 +108,7 @@ export default function List ({list}){
                 <h4>
                 Reviews: 
                 </h4>
-                <ReviewList reviews = {list.reviews}/>
+                <ReviewList reviews = {list.reviews} listName = {list.name}/>
                 {login ?
                 <>
                 <h5>
