@@ -1,12 +1,20 @@
-import React from "react";
+import React, { useState, useRef } from 'react';
 
 
 export default function Admin (){
+    const admin = localStorage.getItem("isAdmin");
+    const userNameRef = useRef()
+
     return(
         <>
-        <div className="Admin">
-            <h1>Admin Page</h1>
-        </div>
+        {admin ? <>
+            <h2>Make User Admin</h2>
+            <br/>
+            <input ref={userNameRef} type="text" placeholder="Enter User Email..."/>
+            <input type="button" defaultValue="Give Admin Rights"/>
+            <br/>
+        </> :null}
+
         </>
     )
 }

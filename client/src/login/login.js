@@ -3,6 +3,7 @@ import ErrorDisplay from "../modules/errorDisplay"
 
 export default function Login(props) {
     const [serverStatus, setServerStatus] = useState([])
+    const [verify, setVerify] = useState("")
 
     const emailRef = useRef()
     const passwordRef = useRef()
@@ -26,28 +27,29 @@ export default function Login(props) {
             .then(data => {
                 if (data.errors) {
                     setServerStatus(data.errors[0].msg)
+                } else if (data.verify) {
+                    setVerify(data.verify[0].msg)
                 } else {
                     localStorage.setItem("x-auth-token", data.token);
                     localStorage.setItem("isLoggedIn", true);
-                    
-                }
-            }
-            )
-        fetch('/api/admins/admincheck', {
-            method: 'get',
-            headers: {
-                'Accept': '/',
-                'Content-Type': 'application/json',
-                'x-auth-token': localStorage.getItem('x-auth-token')
-            }
-        }).then(response =>
-            response.json())
-            .then(data => {
-                if (data.errors) {
-                    console.log("Uh Oh, this shouldn't happen")
-                } else {
-                    localStorage.setItem("isAdmin", data.isAdmin)
-                    window.location = "/"
+                    fetch('/api/admins/admincheck', {
+                        method: 'get',
+                        headers: {
+                            'Accept': '/',
+                            'Content-Type': 'application/json',
+                            'x-auth-token': localStorage.getItem('x-auth-token')
+                        }
+                    }).then(response =>
+                        response.json())
+                        .then(data => {
+                            if (data.errors) {
+                                console.log("Uh Oh, this shouldn't happen")
+                            } else {
+                                localStorage.setItem("isAdmin", data.isAdmin)
+                                window.location = "/"
+                            }
+                        }
+                        )
                 }
             }
             )
@@ -80,6 +82,7 @@ export default function Login(props) {
                     Don't have an account? <a href="/register">Register</a> today!
                 </p>
                 <ErrorDisplay errors={serverStatus} />
+                {verify !== "" ? <><div>{verify}</div></> : null}
             </div>
         </div>
     )
