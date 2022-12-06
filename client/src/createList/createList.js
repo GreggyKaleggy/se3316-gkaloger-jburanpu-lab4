@@ -1,29 +1,15 @@
 import React, {useState, useRef} from "react";
-import TrackList from '../modules/trackList';
+import IDSearch from "../modules/idSearch";
+
 
 export default function CreateList (){
     const login = localStorage.getItem("isLoggedIn");
     const [serverStatus, setServerStatus] = useState("")
-    const [tracks, setTracks] = useState([])
+    
 
     const listNameRef = useRef()
     const listDescriptionRef = useRef()
     const tracksListRef = useRef()
-    const trackIDRef = useRef()
-
-    async function trackIDSearch(e) {
-      setServerStatus("Loading...")
-      fetch('/api/tracks/trackID/'+trackIDRef.current.value)
-        .then(response => response.json())
-        .then(data =>{
-          if (data.errors) {
-            setTracks([])
-            setServerStatus(`Error: ${data.errors[0].msg}`)
-          } else {
-            setServerStatus("")
-            setTracks([data])
-          }})
-    }
 
     async function CreateList(e) {
         const name = listNameRef.current.value
@@ -72,10 +58,7 @@ export default function CreateList (){
         <br/>
         <input onClick={CreateList} type="button" defaultValue="Submit"/>
         <div>{serverStatus}</div>
-        <h2>Search for a track by ID!</h2>
-        <input ref={trackIDRef} type="text" name="trackID" placeholder="Track ID" />
-        <input type="button" defaultValue="Search" onClick={trackIDSearch} />
-        <TrackList tracks={tracks} />
+        <IDSearch/>
         </>
         : null}
         </>
