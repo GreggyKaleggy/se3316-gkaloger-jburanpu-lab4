@@ -6,7 +6,7 @@ export default function Topnav(){
 
     return(
         <nav className="topnav">
-            {admin ? <div className="admin" >Admin User</div> : null}
+            {admin === "true" ? <div className="admin" >Admin User</div> : null}
             <ul>
                 <li>
                 <ActiveLink href="/">Welcome</ActiveLink>
@@ -15,7 +15,7 @@ export default function Topnav(){
                 <ActiveLink href="/MyLists">My Lists</ActiveLink>
                 <ActiveLink href="/CreateList">Create List</ActiveLink>
                 <ActiveLink href="/EditList">Edit List</ActiveLink>
-                {admin ? <ActiveLink href="/Admin">Admin</ActiveLink> : null}
+                {admin === "true" ? <ActiveLink href="/Admin">Admin</ActiveLink> : null}
                 <ActiveLink href="/logout">Log Out</ActiveLink>
                 </> : null}
                 {!login ? <>

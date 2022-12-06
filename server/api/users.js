@@ -41,7 +41,7 @@ router.post('/login', [
             if (err) throw err;
             if (!user.verified) {
                 const link = req.protocol + '://' + req.get('host') + '/api/users/verify/' + user.email + '/' + token;
-                res.json({ verify: [{ msg: 'Please verify your email address at ' + link }] });
+                res.json({ verify: [{ msg: link }] });
             }
             else {
                 res.json({ token });
@@ -91,7 +91,7 @@ router.post('/register', [
             if (err) throw err;
             if (!user.verified) {
                 const link = req.protocol + '://' + req.get('host') + '/api/users/verify/' + user.email + '/' + token;
-                res.json({ verify: [{ msg: 'Please verify your email address at ' + link }] });
+                res.json({ verify: [{ msg: link }] });
             }
             else {
                 res.json({ token });

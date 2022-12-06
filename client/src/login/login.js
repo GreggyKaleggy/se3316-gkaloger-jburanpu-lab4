@@ -7,6 +7,10 @@ export default function Login(props) {
 
     const emailRef = useRef()
     const passwordRef = useRef()
+    
+    function verifyEmail(){
+        window.open(verify, "_Blank")
+    }
 
     async function loginUser(e) {
         const email = emailRef.current.value
@@ -82,7 +86,10 @@ export default function Login(props) {
                     Don't have an account? <a href="/register">Register</a> today!
                 </p>
                 <ErrorDisplay errors={serverStatus} />
-                {verify !== "" ? <><div>{verify}</div></> : null}
+                {verify !== "" ? <>
+                <div>Please Verify your email here:</div>
+                <button onClick = {verifyEmail}> Verify </button>
+                </> : null}
             </div>
         </div>
     )

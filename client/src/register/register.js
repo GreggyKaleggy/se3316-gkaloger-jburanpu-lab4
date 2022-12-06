@@ -3,15 +3,23 @@ import ErrorDisplay from "../modules/errorDisplay"
 
 export default function Register() {
     const [serverStatus, setServerStatus] = useState([])
+    const [verify, setVerify] = useState("")
 
     const usernameRef = useRef()
     const emailRef = useRef()
     const passwordRef = useRef()
 
+    function verifyEmail(){
+        window.open(verify, "_Blank")
+    }
+
     async function registerUser(e) {
         const username = usernameRef.current.value
         const email = emailRef.current.value
         const password = passwordRef.current.value
+        
+        setServerStatus([])
+        setVerify("")
 
         fetch('/api/users/register', {
             method: 'POST',
@@ -29,6 +37,8 @@ export default function Register() {
             .then(data => {
                 if (data.errors) {
                     setServerStatus(data.errors[0].msg)
+                } else if (data.verify) {
+                    setVerify(data.verify[0].msg)
                 } else {
                     localStorage.setItem("x-auth-token", data.token);
                     localStorage.setItem("isLoggedIn", true);
@@ -71,6 +81,10 @@ export default function Register() {
                     Already have an account? <a href="/login">Log in</a>
                 </p>
                 <ErrorDisplay errors = {serverStatus}/>
+                {verify !== "" ? <>
+                <div>Please Verify your email here:</div>
+                <button onClick = {verifyEmail}> Verify </button>
+                </> : null}
             </div>
         </div>
     )
