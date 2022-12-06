@@ -70,7 +70,7 @@ export default function Docs() {
                 </div>
                 <hr></hr>
                 <br />
-                {admin ? <button onClick={() => setEditState(!editState)}>Edit</button> : null}
+                {admin === "true" ? <button onClick={() => setEditState(!editState)}>Edit</button> : null}
                 {editState && (
                     <div>
                         <h2>Edit Document</h2>
