@@ -2,6 +2,9 @@
 .component {
   margin-bottom: 60px;
 }
+.admin {
+  color: red
+}
 
 .topnav {
   background-color: rgb(48, 48, 48);

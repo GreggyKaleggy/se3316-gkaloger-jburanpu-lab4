@@ -70,13 +70,14 @@ router.put('/reviewvisability/:list/:username', auth, async (req, res) => {
     }
 });
 
-router.get('/admincheck/:name', async (req, res) => {
+router.get('/admincheck', auth, async (req, res) => {
     try {
-        const user = await User.findOne({ username: req.params.name });
-        if (!user) {
-            return res.status(400).json({ errors: [{ msg: 'User not found' }] });
+        const currentUser = await userSchema.findById(req.user.id);
+        if (!currentUser.isAdmin) {
+            res.json({isAdmin: false});
+        } else {
+            res.json({isAdmin: true});
         }
-        res.json(user);
     }
     catch (err) {
         console.error(err.message);

@@ -2,9 +2,11 @@ import React from "react";
 
 export default function Topnav(){
     const login = localStorage.getItem("isLoggedIn");
+    const admin = localStorage.getItem("isAdmin");
 
     return(
         <nav className="topnav">
+            {admin ? <div className="admin" >Admin User</div> : null}
             <ul>
                 <li>
                 <ActiveLink href="/">Welcome</ActiveLink>
@@ -13,7 +15,7 @@ export default function Topnav(){
                 <ActiveLink href="/MyLists">My Lists</ActiveLink>
                 <ActiveLink href="/CreateList">Create List</ActiveLink>
                 <ActiveLink href="/EditList">Edit List</ActiveLink>
-                <ActiveLink href="/Tracks">Admin</ActiveLink>
+                {admin ? <ActiveLink href="/Admin">Admin</ActiveLink> : null}
                 <ActiveLink href="/logout">Log Out</ActiveLink>
                 </> : null}
                 {!login ? <>

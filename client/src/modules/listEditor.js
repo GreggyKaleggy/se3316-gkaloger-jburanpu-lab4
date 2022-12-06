@@ -229,7 +229,7 @@ export default function ListEditor ({list}){
             : null}
 
         </div>
-        <br/>
+        <hr/>
         </>
     )
 }
