@@ -147,6 +147,7 @@ router.put('/changepassword', [
         if (!emailCheck) {
             return res.status(400).json({ errors: [{ msg: 'Email address is not associated with any account' }] });
         }
+        //Check if old password is correct
         const isMatch = await bcrypt.compare(oldPassword, emailCheck.password);
         if (!isMatch) {
             return res.status(400).json({ errors: [{ msg: 'The old password you entered is incorrect' }] });
