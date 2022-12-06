@@ -67,7 +67,7 @@ export default function Docs() {
             <br />
             <div>
                 <div className="EditBox" />
-                {admin ? <button onClick={() => setEditState(!editState)}>Edit</button> : null}
+                {admin === "true" ? <button onClick={() => setEditState(!editState)}>Edit</button> : null}
                 {editState && (
                     <div>
                         <h2>Edit Document</h2>

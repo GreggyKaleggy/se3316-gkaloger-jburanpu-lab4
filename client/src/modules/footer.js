@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import docs from "../footerLinks/Privacy";
+import React from "react";
 
 
 export default function Footer() {
@@ -11,7 +10,7 @@ export default function Footer() {
                 <ActiveLink href="/AUP">Acceptable Use Policy</ActiveLink>
                 <ActiveLink href="/DMCA">DMCA and Takedown Policy</ActiveLink>
                 <ActiveLink href="/Privacy">Privacy Policy</ActiveLink>
-                {admin ? <ActiveLink href="/Instructions">DMCA Instructions for Admins</ActiveLink> : null}
+                {admin === "true" ? <ActiveLink href="/Instructions">DMCA Instructions for Admins</ActiveLink> : null}
             </div>
         </nav>
     )
