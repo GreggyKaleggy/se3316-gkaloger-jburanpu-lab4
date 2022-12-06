@@ -2,7 +2,6 @@ import './App.css';
 import Topnav from './modules/topnav';
 import Landing from './landing/landingPage';
 import Home from './home/home';
-import ArtistsPage from './artists/artistsPage';
 import CreateList from './createList/createList';
 import MyLists from './myLists/myLists';
 import EditList from './editList/editList';
@@ -32,9 +31,6 @@ function App() {
       break
     case "/Home":
       Component = Home;
-      break
-    case "/Artists":
-      Component = ArtistsPage;
       break
     case "/CreateList":
       Component = CreateList;
