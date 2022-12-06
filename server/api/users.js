@@ -86,13 +86,15 @@ router.post('/register', [
                 id: user.id
             }
         }
-        const link = '/api/users/verify/' + user.email + '/' + req.header('x-auth-token');
-        if (!user.verified) {
-            return res.status(400).json({ errors: [{ msg: 'Please verify your email address at' + link }] });
-        }
         jwt.sign(payload, config.jwtSecret, { expiresIn: 360000 }, (err, token) => {
             if (err) throw err;
-            res.json({ token });
+            if (!user.verified) {
+                const link = '/api/users/verify/' + user.email + '/' + token;
+                return res.status(400).json({ errors: [{ msg: 'Please verify your email address at' + link }] });
+            }
+            else {
+                res.json({ token });
+            }
         });
     }
     catch (err) {

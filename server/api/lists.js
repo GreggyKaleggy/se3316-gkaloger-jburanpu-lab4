@@ -259,6 +259,7 @@ router.delete('/deleteTracks', [
         for (let i = 0; i < list.tracklist.length; i++) {
             list.duration += list.tracklist[i].trackduration;
         }
+        list.duration = Math.round(list.duration * 100) / 100;
         list.modified = Date.now();
         await list.save();
         res.json(list);
@@ -350,6 +351,7 @@ router.post('/review', [
             list.averageRating += totalRating;
         }
         list.averageRating = list.averageRating / list.reviews.length;
+        list.averageRating = Math.round(list.averageRating * 100) / 100;
         await list.save();
         res.json(list);
     }
