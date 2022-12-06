@@ -115,6 +115,34 @@ router.post('/new', [
     }
 });
 
+router.put('/editlist', [
+    check('newName', 'List name between 3 and 20 characters is required').not().isEmpty().isLength({ min: 3, max: 30 }),
+    check('newDesc', 'Description can be a maximum 1000 characters').isLength({ min: 0, max: 1000 }),
+], auth, async (req, res) => {
+    console.log("Hello")
+    try {
+        const { name, newName, newDesc } = req.body;
+        const list = await List.findOne({ name: name });
+        if (!list) {
+            return res.status(400).json({ errors: [{ msg: "List doesn't exist" }] });
+        }
+        if (list.user != req.user.id) {
+            return res.status(400).json({ errors: [{msg: 'You are not authorized to edit this list'}] });
+        }
+        const listName = await List.findOne({ name: newName });
+        if (listName) {
+            return res.status(400).json({ errors: [{ msg: "List name is already taken" }] });
+        }
+        list.name = newName;
+        list.description = newDesc;
+        await list.save();
+        res.json(list);
+    }
+    catch (err) {
+        console.error(err.message);
+        res.status(500).send('Internal Server Error');
+    }
+})
 
 //Add a track to a list
 router.put('/add/:name', [
@@ -308,35 +336,6 @@ router.put('/changeprivacy/:name/:value', auth, async (req, res) => {
             res.json("list is now public");
         }
 
-    }
-    catch (err) {
-        console.error(err.message);
-        res.status(500).send('Internal Server Error');
-    }
-})
-
-router.put('/editlist/:name', [
-    check('newName', 'List name between 3 and 20 characters is required').not().isEmpty().isLength({ min: 3, max: 30 }),
-    check('newDesc', 'Description can be a maximum 1000 characters').isLength({ min: 0, max: 1000 }),
-], auth, async (req, res) => {
-    try {
-        const name = req.params.name;
-        const { newName, newDesc } = req.body;
-        const list = await List.findOne({ name: name });
-        if (!list) {
-            return res.status(400).json({ errors: [{ msg: "List doesn't exist" }] });
-        }
-        if (list.user != req.user.id) {
-            return res.status(400).json({ error: 'You are not authorized to edit this list' });
-        }
-        const listName = await List.findOne({ name: newName });
-        if (listName) {
-            return res.status(400).json({ errors: [{ msg: "List name is already taken" }] });
-        }
-        list.name = newName;
-        list.description = newDesc;
-        await list.save();
-        res.json(list);
     }
     catch (err) {
         console.error(err.message);
