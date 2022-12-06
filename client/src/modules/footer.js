@@ -3,6 +3,7 @@ import docs from "../footerLinks/Privacy";
 
 
 export default function Footer() {
+    const admin = localStorage.getItem("isAdmin");
 
     return (
         <nav className="footer">
@@ -10,7 +11,7 @@ export default function Footer() {
                 <ActiveLink href="/AUP">Acceptable Use Policy</ActiveLink>
                 <ActiveLink href="/DMCA">DMCA and Takedown Policy</ActiveLink>
                 <ActiveLink href="/Privacy">Privacy Policy</ActiveLink>
-                <ActiveLink href="/Instructions">DMCA Instructions for Admins</ActiveLink>
+                {admin ? <ActiveLink href="/Instructions">DMCA Instructions for Admins</ActiveLink> : null}
             </div>
         </nav>
     )
@@ -23,6 +24,3 @@ export default function Footer() {
     }
 
 }
-
-
-

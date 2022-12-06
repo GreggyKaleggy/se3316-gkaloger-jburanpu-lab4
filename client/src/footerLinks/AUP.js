@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 
 
 export default function Docs() {
+    const admin = localStorage.getItem("isAdmin");
     const [results, setResults] = React.useState({});
     const [error, setError] = React.useState(null);
     const [isLoaded, setIsLoaded] = React.useState(false);
@@ -69,25 +70,23 @@ export default function Docs() {
                 </div>
                 <hr></hr>
                 <br />
-                <div className="EditBox">
-                    <button onClick={() => setEditState(!editState)}>Edit</button>
-                    {editState && (
+                {admin ? <button onClick={() => setEditState(!editState)}>Edit</button> : null}
+                {editState && (
+                    <div>
+                        <h2>Edit Document</h2>
                         <div>
-                            <h2>Edit Document</h2>
-                            <div>
-                                <label htmlFor="title">Title</label>
-                                <br />
-                                <input type="text" id="title" ref={titleRef} defaultValue={title} />
-                                <br />
-                                <label htmlFor="content">Content</label>
-                                <br />
-                                <input type="text" id="content" ref={contentRef} defaultValue={content} />
-                                <br />
-                                <button onClick={editDoc}>Save</button>
-                            </div>
+                            <label htmlFor="title">Title</label>
+                            <br />
+                            <input type="text" id="title" ref={titleRef} defaultValue={title} />
+                            <br />
+                            <label htmlFor="content">Content</label>
+                            <br />
+                            <input type="text" id="content" ref={contentRef} defaultValue={content} />
+                            <br />
+                            <button onClick={editDoc}>Save</button>
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
         </>
     )

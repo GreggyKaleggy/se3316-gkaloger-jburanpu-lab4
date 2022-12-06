@@ -3,6 +3,7 @@ import jwt_decode from 'jwt-decode';
 
 
 export default function Docs() {
+    const admin = localStorage.getItem("isAdmin");
     const [results, setResults] = React.useState({});
     const [error, setError] = React.useState(null);
     const [isLoaded, setIsLoaded] = React.useState(false);
@@ -49,17 +50,6 @@ export default function Docs() {
             })
     }
 
-    function isAdmin() {
-        const token = localStorage.getItem('x-auth-token')
-        if (token) {
-            const decoded = jwt_decode(token)
-            if (decoded.isAdmin) {
-                return true
-            }
-        }
-        return false
-    }
-
     return (
         <>
             <div>
@@ -76,7 +66,7 @@ export default function Docs() {
             <hr />
             <br />
             <div className="EditBox">
-                {isAdmin() && (<button onClick={() => setEditState(!editState)}>Edit Document</button>)}
+                {admin ? <button onClick={() => setEditState(!editState)}>Edit</button> : null}
                 {editState && (
                     <div>
                         <h2>Edit Document</h2>
