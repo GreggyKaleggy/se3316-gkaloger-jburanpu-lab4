@@ -132,14 +132,16 @@ router.post('/register', [
 //@access   Private
 router.put('/changepassword', [
     //Input validation using express-validator
-    check('newPassword', 'Please enter valid password').isLength({ min: 6, max: 30 }).trim().escape()
+    check('email', 'Please include valid email').isEmail().normalizeEmail(),
+    check('oldPassword', 'Please enter valid old password').isLength({ min: 6, max: 30 }).trim().escape(),
+    check('newPassword', 'Please enter valid new password').isLength({ min: 6, max: 30 }).trim().escape()
 ], async (req, res) => {
-    //Display errors if any
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        error = errors.array().map(error => error.msg);
-        return res.status(400).json({ error });
-    }
+   //Display errors if any
+   const errors = validationResult(req);
+   if (!errors.isEmpty()) {
+       var errorMsg = errors.array().map(error => error.msg);
+       return res.status(400).json({ errors: [{ msg: errorMsg }] });
+   }
     try {
         const { email, oldPassword, newPassword } = req.body;
         //Check if email exists

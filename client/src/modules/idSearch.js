@@ -18,7 +18,7 @@ export default function IDSearch (){
         .then(data =>{
           if (data.errors) {
             setTracks([])
-            setServerStatus(`Error: ${data.errors[0].msg}`)
+            setServerStatus(data.errors[0].msg)
           } else {
             setServerStatus([])
             setTracks([data])

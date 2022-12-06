@@ -66,7 +66,7 @@ export default function List ({list}){
           response.json())
           .then(data => {
             if (data.errors) {
-              setServerStatus(`Error: ${data.errors[0].msg}`)
+              setServerStatus(data.errors[0].msg)
             } else {
               setServerStatus(`Review Added`)
             }

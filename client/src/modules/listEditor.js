@@ -62,7 +62,7 @@ export default function ListEditor ({list}){
           response.json())
           .then(data => {
             if (data.errors) {
-              setServerStatus(`Error: ${data.errors[0].msg}`)
+              setServerStatus(data.errors[0].msg)
             } else {
               setServerStatus(`List ${listName} Updated!`)
             }
@@ -89,7 +89,7 @@ export default function ListEditor ({list}){
             response.json())
             .then(data => {
               if (data.errors) {
-                setServerStatus(`Error: ${data.errors[0].msg}`)
+                setServerStatus(data.errors[0].msg)
               } else {
                 setServerStatus(`List ${listName} Updated!`)
                 
@@ -117,7 +117,7 @@ export default function ListEditor ({list}){
             response.json())
             .then(data => {
               if (data.errors) {
-                setServerStatus(`Error: ${data.errors[0].msg}`)
+                setServerStatus(data.errors[0].msg)
               } else {
                 setServerStatus(`List ${listName} Updated!`)
                 
@@ -145,7 +145,7 @@ export default function ListEditor ({list}){
             response.json())
             .then(data => {
               if (data.errors) {
-                setServerStatus(`Error: ${data.errors[0].msg}`)
+                setServerStatus(data.errors[0].msg)
               } else {
                 setServerStatus(`List ${listName} Updated!`)
                 
@@ -170,7 +170,7 @@ export default function ListEditor ({list}){
             response.json())
             .then(data => {
               if (data.errors) {
-                setServerStatus(`Error: ${data.errors[0].msg}`)
+                setServerStatus(data.errors[0].msg)
               } else {
                 setServerStatus(`List ${listName} Deleted!`)
               }
