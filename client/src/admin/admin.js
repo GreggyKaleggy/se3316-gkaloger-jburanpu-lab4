@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import ErrorDisplay from '../modules/errorDisplay';
 
-export default function Admin (){
+export default function Admin() {
     const admin = localStorage.getItem("isAdmin");
     const [serverStatus, setServerStatus] = useState([])
 
@@ -9,41 +9,71 @@ export default function Admin (){
 
     async function makeAdmin(e) {
         const email = userEmailRef.current.value
-        
+
         setServerStatus("Loading...")
         fetch('/api/admins/changestatus', {
-          method: 'PUT',
-          headers: {
-            'Accept': '/',
-            'Content-Type': 'application/json',
-            'x-auth-token': localStorage.getItem('x-auth-token')
-          },
-          body: JSON.stringify({
-            email : email,
-            isAdmin: true
-          })
+            method: 'PUT',
+            headers: {
+                'Accept': '/',
+                'Content-Type': 'application/json',
+                'x-auth-token': localStorage.getItem('x-auth-token')
+            },
+            body: JSON.stringify({
+                email: email,
+                isAdmin: true
+            })
         }).then(response =>
-          response.json())
-          .then(data => {
-            if (data.errors) {
-              setServerStatus(`Error: ${data.errors[0].msg}`)
-            } else {
-              setServerStatus(`User has been made Admin!`)
+            response.json())
+            .then(data => {
+                if (data.errors) {
+                    setServerStatus(`Error: ${data.errors[0].msg}`)
+                } else {
+                    setServerStatus(`User has been made Admin!`)
+                }
             }
-          }
-          )
-      }
+            )
+    }
 
-    return(
+    async function deactivateUser(e) {
+        const email = userEmailRef.current.value
+
+        setServerStatus("Loading...")
+        fetch('/api/admins/deactivate', {
+            method: 'PUT',
+            headers: {
+                'Accept': '/',
+                'Content-Type': 'application/json',
+                'x-auth-token': localStorage.getItem('x-auth-token')
+            },
+            body: JSON.stringify({
+                email: email,
+                deactivated: true
+            })
+        }).then(response =>
+            response.json())
+            .then(data => {
+                if (data.errors) {
+                    setServerStatus(`Error: ${data.errors[0].msg}`)
+                } else {
+                    setServerStatus(`User has been deactivated!`)
+                }
+            }
+            )
+    }
+
+    return (
         <>
-        {admin ? <>
-            <ErrorDisplay errors = {serverStatus}/>
-            <h2>Make User Admin</h2>
-            <br/>
-            <input ref={userEmailRef} type="text" placeholder="Enter User Email..."/>
-            <input type="button" onClick={makeAdmin} defaultValue="Give Admin Rights"/>
-            <br/>
-        </> :null}
+            {admin ? <>
+                <ErrorDisplay errors={serverStatus} />
+                <h2>Admin Tools</h2>
+                <br />
+                <input ref={userEmailRef} type="text" placeholder="Enter User Email..." />
+                <br />
+                <input type="button" onClick={makeAdmin} defaultValue="Give Admin Rights" />
+                <br />
+                <input type="button" onClick={deactivateUser} defaultValue="Deactivate User" />
+                <br />
+            </> : null}
         </>
     )
 }

@@ -38,11 +38,18 @@ router.put('/changestatus', [
 });
 
 //admin deactivating users
-router.put('/deactivate', auth, async (req, res) => {
+router.put('/deactivate', [
+    check('email', 'Please include valid email').isEmail().normalizeEmail()
+], auth, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        var errorMsg = errors.array().map(error => error.msg);
+        return res.status(400).json({ errors: [{ msg: errorMsg }] });
+    }
     try {
         const currentUser = await userSchema.findById(req.user.id);
         if (!currentUser.isAdmin) {
-            return res.status(401).json({ msg: 'You are not authorized to perform this action' });
+            return res.status(401).json({ errors: [{msg: 'You are not authorized to perform this action'}] });
         }
         const { email, deactivated } = req.body;
         let emailCheck = await User.findOne({ email: email });
