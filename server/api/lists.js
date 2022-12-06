@@ -104,6 +104,7 @@ router.post('/new', [
         for (let i = 0; i < newList.tracklist.length; i++) {
             newList.duration += newList.tracklist[i].trackduration;
         }
+        newList.duration = Math.round(newList.duration * 100) / 100;
 
         await newList.save();
         res.json(newList);
