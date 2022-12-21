@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-const uri = "mongodb+srv://jamjam:jamjamjam123@cluster0.z9pyd3y.mongodb.net/?retryWrites=true&w=majority"
+//get mongo uri from env file
+const uri = process.env.MONGO_URI;
 
 
 //connecting to database
